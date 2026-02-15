@@ -79,15 +79,16 @@ const Builder = () => {
     }, [resumeData, template]);
 
     const calculateATSScore = (data) => {
+        if (!data) return;
         let s = 0;
         const sugs = [];
 
         // Rules
-        if (data.personal.name) s += 10; else sugs.push({ id: 'name', text: "Add your full name (+10)" });
-        if (data.personal.email) s += 10; else sugs.push({ id: 'email', text: "Add a professional email (+10)" });
+        if (data.personal?.name) s += 10; else sugs.push({ id: 'name', text: "Add your full name (+10)" });
+        if (data.personal?.email) s += 10; else sugs.push({ id: 'email', text: "Add a professional email (+10)" });
         if (data.summary?.length > 50) s += 10; else sugs.push({ id: 'summary', text: "Write a summary >50 chars (+10)" });
 
-        const hasBullets = data.experience?.some(e => e.description.includes('•') || e.description.includes('-'));
+        const hasBullets = data.experience?.some(e => e.description?.includes('•') || e.description?.includes('-') || e.description?.includes('\n'));
         if (hasBullets) s += 15; else sugs.push({ id: 'bullets', text: "Use bullet points in experience (+15)" });
 
         if (data.education?.length > 0) s += 10; else sugs.push({ id: 'edu', text: "Add education history (+10)" });
@@ -97,11 +98,11 @@ const Builder = () => {
 
         if (data.projects?.length > 0) s += 10; else sugs.push({ id: 'proj', text: "Add at least 1 project (+10)" });
 
-        if (data.personal.phone) s += 5; else sugs.push({ id: 'phone', text: "Add phone number (+5)" });
+        if (data.personal?.phone) s += 5; else sugs.push({ id: 'phone', text: "Add phone number (+5)" });
         if (data.links?.linkedin) s += 5; else sugs.push({ id: 'li', text: "Add LinkedIn (+5)" });
         if (data.links?.github) s += 5; else sugs.push({ id: 'gh', text: "Add GitHub (+5)" });
 
-        const hasVerbs = ACTION_VERBS.some(v => data.summary?.toLowerCase().includes(v));
+        const hasVerbs = ACTION_VERBS.some(v => data.summary?.toLowerCase().includes(v.toLowerCase()));
         if (hasVerbs) s += 10; else sugs.push({ id: 'verbs', text: "Use action verbs in summary (+10)" });
 
         setScore(s);

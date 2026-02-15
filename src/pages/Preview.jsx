@@ -45,29 +45,30 @@ const Preview = () => {
         const sugs = [];
 
         // Rules
-        if (data.personal.name) s += 10; else sugs.push({ text: "Add your full name", points: 10 });
-        if (data.personal.email) s += 10; else sugs.push({ text: "Add a professional email", points: 10 });
-        if (data.summary?.length > 50) s += 10; else sugs.push({ text: "Write a summary (>50 chars)", points: 10 });
+        if (data.personal.name) s += 10; else sugs.push({ points: 10, text: "Add your full name (+10)" });
+        if (data.personal.email) s += 10; else sugs.push({ points: 10, text: "Add a professional email (+10)" });
+        if (data.summary?.length > 50) s += 10; else sugs.push({ points: 10, text: "Write a summary >50 chars (+10)" });
 
-        const hasBullets = data.experience?.some(e => e.description.includes('•') || e.description.includes('-'));
-        if (hasBullets) s += 15; else sugs.push({ text: "Use bullet points in experience", points: 15 });
+        const hasBullets = data.experience?.some(e => e.description.includes('•') || e.description.includes('-') || e.description.includes('\n'));
+        if (hasBullets) s += 15; else sugs.push({ points: 15, text: "Use bullet points in experience (+15)" });
 
-        if (data.education?.length > 0) s += 10; else sugs.push({ text: "Add education history", points: 10 });
+        if (data.education?.length > 0) s += 10; else sugs.push({ points: 10, text: "Add education history (+10)" });
 
         const skillCount = (data.skills?.technical?.length || 0) + (data.skills?.soft?.length || 0) + (data.skills?.tools?.length || 0);
-        if (skillCount >= 5) s += 10; else sugs.push({ text: "Add at least 5 skills", points: 10 });
+        if (skillCount >= 5) s += 10; else sugs.push({ points: 10, text: "Add at least 5 skills (+10)" });
 
-        if (data.projects?.length > 0) s += 10; else sugs.push({ text: "Add at least 1 project", points: 10 });
+        if (data.projects?.length > 0) s += 10; else sugs.push({ points: 10, text: "Add at least 1 project (+10)" });
 
-        if (data.personal.phone) s += 5; else sugs.push({ text: "Add phone number", points: 5 });
-        if (data.links?.linkedin) s += 5; else sugs.push({ text: "Add LinkedIn profile", points: 5 });
-        if (data.links?.github) s += 5; else sugs.push({ text: "Add GitHub profile", points: 5 });
+        if (data.personal.phone) s += 5; else sugs.push({ points: 5, text: "Add phone number (+5)" });
+        if (data.links?.linkedin) s += 5; else sugs.push({ points: 5, text: "Add LinkedIn (+5)" });
+        if (data.links?.github) s += 5; else sugs.push({ points: 5, text: "Add GitHub (+5)" });
 
-        const hasVerbs = ACTION_VERBS.some(v => data.summary?.toLowerCase().includes(v));
-        if (hasVerbs) s += 10; else sugs.push({ text: "Use action verbs in summary", points: 10 });
+        const ACTION_VERBS = ['Built', 'Developed', 'Designed', 'Implemented', 'Led', 'Improved', 'Created', 'Optimized', 'Automated'];
+        const hasVerbs = ACTION_VERBS.some(v => data.summary?.toLowerCase().includes(v.toLowerCase()));
+        if (hasVerbs) s += 10; else sugs.push({ points: 10, text: "Use action verbs in summary (+10)" });
 
         setScore(s);
-        setSuggestions(sugs.slice(0, 3)); // Show top 3
+        setSuggestions(sugs.slice(0, 3));
     };
 
     const validateResume = (data) => {
@@ -136,6 +137,21 @@ ${resumeData.projects?.map(proj => `${proj.title}\n${proj.description}\nTech: ${
         if (score <= 40) return 'Needs Work';
         if (score <= 70) return 'Getting There';
         return 'Strong Resume';
+    };
+
+    const renderDescription = (description) => {
+        if (!description) return null;
+        const items = description.split('\n').filter(item => item.trim() !== '');
+        if (items.length > 1) {
+            return (
+                <ul style={{ paddingLeft: '20px', margin: 0 }}>
+                    {items.map((item, index) => (
+                        <li key={index} style={{ marginBottom: '4px' }}>{item.replace(/^[•-]\s*/, '')}</li>
+                    ))}
+                </ul>
+            );
+        }
+        return <p style={{ margin: 0 }}>{description}</p>;
     };
 
     return (
@@ -250,59 +266,166 @@ ${resumeData.projects?.map(proj => `${proj.title}\n${proj.description}\nTech: ${
             )}
 
             {/* Final Resume Render */}
-            <div
-                className={`resume-paper template-${template.toLowerCase()}`}
-                style={{ ...themeStyles }}
-            >
-                {template === 'Modern' ? (
-                    <div className="template-modern">
-                        <aside className="modern-sidebar">
-                            <div className="resume-header" style={{ textAlign: 'left', marginBottom: '40px' }}>
-                                <h1 className="resume-name" style={{ fontSize: '2rem' }}>{resumeData.personal.name}</h1>
-                                <div style={{ fontSize: '0.8rem', opacity: 0.9, lineHeight: 1.6 }}>
-                                    <div>{resumeData.personal.email}</div>
-                                    <div>{resumeData.personal.phone}</div>
-                                    <div>{resumeData.personal.location}</div>
+            {!resumeData ? (
+                <div className="card" style={{ padding: '64px', textAlign: 'center', color: 'var(--text-secondary)' }}>
+                    <Info size={48} style={{ marginBottom: '16px', opacity: 0.5 }} />
+                    <h3>No Resume Data Found</h3>
+                    <p>Start by entering your details in the Builder.</p>
+                </div>
+            ) : (
+                <div
+                    className={`resume-paper template-${template.toLowerCase()}`}
+                    style={{ ...themeStyles }}
+                >
+                    {template === 'Modern' ? (
+                        <div className="template-modern">
+                            <aside className="modern-sidebar">
+                                <div className="resume-header" style={{ textAlign: 'left', marginBottom: '40px' }}>
+                                    <h1 className="resume-name" style={{ fontSize: '2rem' }}>{resumeData.personal.name}</h1>
+                                    <div style={{ fontSize: '0.8rem', opacity: 0.9, lineHeight: 1.6 }}>
+                                        <div>{resumeData.personal.email}</div>
+                                        <div>{resumeData.personal.phone}</div>
+                                        <div>{resumeData.personal.location}</div>
+                                    </div>
+                                    <div style={{ marginTop: '16px', display: 'flex', gap: '12px' }}>
+                                        {resumeData.links?.github && <a href={resumeData.links.github} target="_blank" rel="noopener noreferrer" style={{ color: 'white' }}><Github size={16} /></a>}
+                                        {resumeData.links?.linkedin && <a href={resumeData.links.linkedin} target="_blank" rel="noopener noreferrer" style={{ color: 'white' }}><Linkedin size={16} /></a>}
+                                    </div>
+                                </div>
+
+                                <div className="resume-section">
+                                    <div className="resume-section-title" style={{ color: 'white', borderBottomColor: 'rgba(255,255,255,0.3)', fontSize: '0.9rem' }}>Skills</div>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                        {resumeData.skills?.technical?.length > 0 && (
+                                            <div>
+                                                <div style={{ fontSize: '0.75rem', fontWeight: 700, opacity: 0.8, textTransform: 'uppercase', marginBottom: '4px' }}>Technical</div>
+                                                <div style={{ fontSize: '0.85rem' }}>{resumeData.skills.technical.join(', ')}</div>
+                                            </div>
+                                        )}
+                                        {resumeData.skills?.soft?.length > 0 && (
+                                            <div>
+                                                <div style={{ fontSize: '0.75rem', fontWeight: 700, opacity: 0.8, textTransform: 'uppercase', marginBottom: '4px' }}>Soft</div>
+                                                <div style={{ fontSize: '0.85rem' }}>{resumeData.skills.soft.join(', ')}</div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {resumeData.education?.length > 0 && (
+                                    <div className="resume-section">
+                                        <div className="resume-section-title" style={{ color: 'white', borderBottomColor: 'rgba(255,255,255,0.3)', fontSize: '0.9rem' }}>Education</div>
+                                        {resumeData.education.map((edu, i) => (
+                                            <div key={i} style={{ marginBottom: '12px', fontSize: '0.85rem' }}>
+                                                <div style={{ fontWeight: 700 }}>{edu.school}</div>
+                                                <div>{edu.degree}</div>
+                                                <div style={{ opacity: 0.8 }}>{edu.year}</div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </aside>
+                            <main className="modern-main">
+                                {resumeData.summary && (
+                                    <section className="resume-section">
+                                        <div className="resume-section-title">Summary</div>
+                                        <p style={{ fontSize: '0.9rem', color: '#333' }}>{resumeData.summary}</p>
+                                    </section>
+                                )}
+
+                                {resumeData.experience?.length > 0 && (
+                                    <section className="resume-section">
+                                        <div className="resume-section-title">Experience</div>
+                                        {resumeData.experience.map((exp, i) => (
+                                            <div key={i} style={{ marginBottom: '16px' }}>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700, fontSize: '0.95rem' }}>
+                                                    <span>{exp.company}</span>
+                                                    <span style={{ fontWeight: 400, color: '#666' }}>{exp.duration}</span>
+                                                </div>
+                                                <div style={{ fontStyle: 'italic', color: themeColor, fontSize: '0.9rem', marginBottom: '4px' }}>{exp.role}</div>
+                                                <div style={{ fontSize: '0.9rem', color: '#444' }}>
+                                                    {renderDescription(exp.description)}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </section>
+                                )}
+
+                                {resumeData.projects?.length > 0 && (
+                                    <section className="resume-section">
+                                        <div className="resume-section-title">Projects</div>
+                                        {resumeData.projects.map((proj, i) => (
+                                            <div key={i} style={{ marginBottom: '16px' }}>
+                                                <div style={{ fontWeight: 700, fontSize: '0.95rem' }}>{proj.title}</div>
+                                                <div style={{ fontSize: '0.9rem', color: '#444' }}>
+                                                    {renderDescription(proj.description)}
+                                                </div>
+                                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '4px' }}>
+                                                    {proj.techStack?.map(t => <span key={t} style={{ fontSize: '0.7rem', padding: '1px 6px', border: '1px solid #ddd', borderRadius: '4px' }}>{t}</span>)}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </section>
+                                )}
+                            </main>
+                        </div>
+                    ) : (
+                        <div className="classic-layout" style={{ padding: '60px' }}>
+                            <div className="resume-header">
+                                <h1 className="resume-name" style={{ color: template === 'Minimal' ? '#111' : themeColor }}>{resumeData.personal.name}</h1>
+                                <div className="resume-contact" style={{ gap: '16px' }}>
+                                    <span>{resumeData.personal.email}</span>
+                                    <span>{resumeData.personal.phone}</span>
+                                    <span>{resumeData.personal.location}</span>
+                                </div>
+                                <div className="resume-contact" style={{ gap: '12px', marginTop: '8px', justifyContent: 'center' }}>
+                                    {resumeData.links?.github && <a href={resumeData.links.github} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '4px' }}><Github size={14} /> GitHub</a>}
+                                    {resumeData.links?.linkedin && <a href={resumeData.links.linkedin} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '4px' }}><Linkedin size={14} /> LinkedIn</a>}
                                 </div>
                             </div>
 
-                            <div className="resume-section">
-                                <div className="resume-section-title" style={{ color: 'white', borderBottomColor: 'rgba(255,255,255,0.3)', fontSize: '0.9rem' }}>Skills</div>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                                    {resumeData.skills?.technical?.length > 0 && (
-                                        <div>
-                                            <div style={{ fontSize: '0.75rem', fontWeight: 700, opacity: 0.8, textTransform: 'uppercase', marginBottom: '4px' }}>Technical</div>
-                                            <div style={{ fontSize: '0.85rem' }}>{resumeData.skills.technical.join(', ')}</div>
-                                        </div>
-                                    )}
-                                    {resumeData.skills?.soft?.length > 0 && (
-                                        <div>
-                                            <div style={{ fontSize: '0.75rem', fontWeight: 700, opacity: 0.8, textTransform: 'uppercase', marginBottom: '4px' }}>Soft</div>
-                                            <div style={{ fontSize: '0.85rem' }}>{resumeData.skills.soft.join(', ')}</div>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        </aside>
-                        <main className="modern-main">
                             {resumeData.summary && (
-                                <section className="resume-section">
-                                    <div className="resume-section-title">Summary</div>
-                                    <p style={{ fontSize: '0.9rem', color: '#333' }}>{resumeData.summary}</p>
+                                <section className="resume-section" style={{ marginBottom: '24px' }}>
+                                    <div className="resume-section-title" style={{ color: themeColor, borderBottomColor: template === 'Minimal' ? 'transparent' : themeColor }}>Summary</div>
+                                    <p style={{ fontSize: '0.95rem' }}>{resumeData.summary}</p>
                                 </section>
                             )}
 
+                            <section className="resume-section" style={{ marginBottom: '24px' }}>
+                                <div className="resume-section-title" style={{ color: themeColor, borderBottomColor: template === 'Minimal' ? 'transparent' : themeColor }}>Skills</div>
+                                <div style={{ fontSize: '0.95rem' }}>
+                                    <strong>Technical:</strong> {resumeData.skills?.technical?.join(', ')}
+                                    {resumeData.skills?.soft?.length > 0 && <div style={{ marginTop: '4px' }}><strong>Soft:</strong> {resumeData.skills.soft.join(', ')}</div>}
+                                </div>
+                            </section>
+
                             {resumeData.experience?.length > 0 && (
-                                <section className="resume-section">
-                                    <div className="resume-section-title">Experience</div>
+                                <section className="resume-section" style={{ marginBottom: '24px' }}>
+                                    <div className="resume-section-title" style={{ color: themeColor, borderBottomColor: template === 'Minimal' ? 'transparent' : themeColor }}>Experience</div>
                                     {resumeData.experience.map((exp, i) => (
                                         <div key={i} style={{ marginBottom: '16px' }}>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700, fontSize: '0.95rem' }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700 }}>
                                                 <span>{exp.company}</span>
-                                                <span style={{ fontWeight: 400, color: '#666' }}>{exp.duration}</span>
+                                                <span style={{ fontWeight: 400 }}>{exp.duration}</span>
                                             </div>
-                                            <div style={{ fontStyle: 'italic', color: themeColor, fontSize: '0.9rem', marginBottom: '4px' }}>{exp.role}</div>
-                                            <p style={{ fontSize: '0.9rem', color: '#444' }}>• {exp.description}</p>
+                                            <div style={{ fontStyle: 'italic', marginBottom: '4px' }}>{exp.role}</div>
+                                            <div style={{ fontSize: '0.95rem' }}>
+                                                {renderDescription(exp.description)}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </section>
+                            )}
+
+                            {resumeData.education?.length > 0 && (
+                                <section className="resume-section" style={{ marginBottom: '24px' }}>
+                                    <div className="resume-section-title" style={{ color: themeColor, borderBottomColor: template === 'Minimal' ? 'transparent' : themeColor }}>Education</div>
+                                    {resumeData.education.map((edu, i) => (
+                                        <div key={i} style={{ marginBottom: '12px' }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700 }}>
+                                                <span>{edu.school}</span>
+                                                <span style={{ fontWeight: 400 }}>{edu.year}</span>
+                                            </div>
+                                            <div>{edu.degree}</div>
                                         </div>
                                     ))}
                                 </section>
@@ -310,64 +433,30 @@ ${resumeData.projects?.map(proj => `${proj.title}\n${proj.description}\nTech: ${
 
                             {resumeData.projects?.length > 0 && (
                                 <section className="resume-section">
-                                    <div className="resume-section-title">Projects</div>
+                                    <div className="resume-section-title" style={{ color: themeColor, borderBottomColor: template === 'Minimal' ? 'transparent' : themeColor }}>Projects</div>
                                     {resumeData.projects.map((proj, i) => (
                                         <div key={i} style={{ marginBottom: '16px' }}>
-                                            <div style={{ fontWeight: 700, fontSize: '0.95rem' }}>{proj.title}</div>
-                                            <p style={{ fontSize: '0.9rem', color: '#444' }}>• {proj.description}</p>
-                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '4px' }}>
-                                                {proj.techStack?.map(t => <span key={t} style={{ fontSize: '0.7rem', padding: '1px 6px', border: '1px solid #ddd', borderRadius: '4px' }}>{t}</span>)}
+                                            <div style={{ fontWeight: 700, display: 'flex', justifyContent: 'space-between' }}>
+                                                <span>{proj.title}</span>
+                                                <div style={{ display: 'flex', gap: '8px' }}>
+                                                    {proj.githubUrl && <a href={proj.githubUrl} target="_blank" rel="noopener noreferrer" style={{ color: themeColor }}><Github size={14} /></a>}
+                                                    {proj.liveUrl && <a href={proj.liveUrl} target="_blank" rel="noopener noreferrer" style={{ color: themeColor }}><ExternalLink size={14} /></a>}
+                                                </div>
+                                            </div>
+                                            <div style={{ fontSize: '0.95rem' }}>
+                                                {renderDescription(proj.description)}
+                                            </div>
+                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '6px' }}>
+                                                {proj.techStack?.map(t => <span key={t} className="preview-pill" style={{ margin: 0 }}>{t}</span>)}
                                             </div>
                                         </div>
                                     ))}
                                 </section>
                             )}
-                        </main>
-                    </div>
-                ) : (
-                    <div className="classic-layout" style={{ padding: '60px' }}>
-                        <div className="resume-header">
-                            <h1 className="resume-name" style={{ color: template === 'Minimal' ? '#111' : themeColor }}>{resumeData.personal.name}</h1>
-                            <div className="resume-contact" style={{ gap: '16px' }}>
-                                <span>{resumeData.personal.email}</span>
-                                <span>{resumeData.personal.phone}</span>
-                                <span>{resumeData.personal.location}</span>
-                            </div>
                         </div>
-
-                        {resumeData.summary && (
-                            <section className="resume-section" style={{ marginBottom: '24px' }}>
-                                <div className="resume-section-title" style={{ color: themeColor, borderBottomColor: template === 'Minimal' ? 'transparent' : themeColor }}>Summary</div>
-                                <p style={{ fontSize: '0.95rem' }}>{resumeData.summary}</p>
-                            </section>
-                        )}
-
-                        <section className="resume-section" style={{ marginBottom: '24px' }}>
-                            <div className="resume-section-title" style={{ color: themeColor, borderBottomColor: template === 'Minimal' ? 'transparent' : themeColor }}>Skills</div>
-                            <div style={{ fontSize: '0.95rem' }}>
-                                <strong>Technical:</strong> {resumeData.skills?.technical?.join(', ')}
-                                {resumeData.skills?.soft?.length > 0 && <div style={{ marginTop: '4px' }}><strong>Soft:</strong> {resumeData.skills.soft.join(', ')}</div>}
-                            </div>
-                        </section>
-
-                        {resumeData.experience?.length > 0 && (
-                            <section className="resume-section" style={{ marginBottom: '24px' }}>
-                                <div className="resume-section-title" style={{ color: themeColor, borderBottomColor: template === 'Minimal' ? 'transparent' : themeColor }}>Experience</div>
-                                {resumeData.experience.map((exp, i) => (
-                                    <div key={i} style={{ marginBottom: '16px' }}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700 }}>
-                                            <span>{exp.company}</span>
-                                            <span style={{ fontWeight: 400 }}>{exp.duration}</span>
-                                        </div>
-                                        <div style={{ fontStyle: 'italic', marginBottom: '4px' }}>{exp.role}</div>
-                                        <p style={{ fontSize: '0.95rem' }}>• {exp.description}</p>
-                                    </div>
-                                ))}
-                            </section>
-                        )}
-                    </div>
-                )}
-            </div>
+                    )}
+                </div>
+            )}
 
             {showToast && (
                 <div className="toast-notification">
