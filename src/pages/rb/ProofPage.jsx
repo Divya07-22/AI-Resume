@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CheckCircle, XCircle, Link as LinkIcon, Github, Globe, Copy } from 'lucide-react';
+import { CheckCircle, XCircle, Link as LinkIcon, Github, Globe, Copy, ShieldCheck, CheckCircle2 } from 'lucide-react';
 
 const ProofPage = () => {
     const [links, setLinks] = useState({
@@ -8,9 +8,16 @@ const ProofPage = () => {
         deploy: ''
     });
 
+    const [checks, setChecks] = useState({
+        c1: false, c2: false, c3: false, c4: false, c5: false,
+        c6: false, c7: false, c8: false, c9: false, c10: false
+    });
+
     const [stepStatus, setStepStatus] = useState([]);
+    const [isShipped, setIsShipped] = useState(false);
 
     useEffect(() => {
+        // Load step status
         const status = Array.from({ length: 8 }, (_, i) => {
             const stepId = (i + 1).toString().padStart(2, '0');
             return {
@@ -19,137 +26,213 @@ const ProofPage = () => {
             };
         });
         setStepStatus(status);
+
+        // Load saved links
+        const savedLinks = localStorage.getItem('rb_final_submission');
+        if (savedLinks) {
+            try { setLinks(JSON.parse(savedLinks)); } catch (e) { }
+        }
     }, []);
+
+    // Check Shipped Status
+    useEffect(() => {
+        const allStepsDone = stepStatus.length === 8 && stepStatus.every(s => s.completed);
+        const allChecksDone = Object.values(checks).every(v => v === true);
+        const urlRegex = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/;
+        const allLinksValid = urlRegex.test(links.lovable) && urlRegex.test(links.github) && urlRegex.test(links.deploy);
+
+        const shipped = allStepsDone && allChecksDone && allLinksValid;
+        setIsShipped(shipped);
+
+        if (shipped) {
+            localStorage.setItem('rb_project_status', 'Shipped');
+        } else {
+            localStorage.setItem('rb_project_status', 'In Progress');
+        }
+
+        localStorage.setItem('rb_final_submission', JSON.stringify(links));
+    }, [stepStatus, checks, links]);
 
     const handleCopyFinal = () => {
         const text = `
-AI Resume Builder — Project 3 Submission
----------------------------------------
-Status: 8/8 Steps Completed
+------------------------------------------
+AI Resume Builder — Final Submission
 
-Links:
-- Lovable: ${links.lovable}
-- GitHub: ${links.github}
-- Live Demo: ${links.deploy}
+Lovable Project: ${links.lovable}
+GitHub Repository: ${links.github}
+Live Deployment: ${links.deploy}
 
-Verified by KodNest Premium Build System
-    `.trim();
+Core Capabilities:
+- Structured resume builder
+- Deterministic ATS scoring
+- Template switching
+- PDF export with clean formatting
+- Persistence + validation checklist
+------------------------------------------
+`.trim();
 
         navigator.clipboard.writeText(text);
         alert('Final Submission copied to clipboard!');
     };
 
-    return (
-        <div className="proof-page">
-            <div className="card" style={{ maxWidth: '900px', margin: '0 auto' }}>
-                <h1 style={{ fontSize: '2rem', marginBottom: 'var(--spacing-lg)', color: 'var(--accent)' }}>
-                    Project 3 — Proof of Work
-                </h1>
+    const toggleCheck = (id) => {
+        setChecks(prev => ({ ...prev, [id]: !prev[id] }));
+    };
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px', marginBottom: 'var(--spacing-xl)' }}>
-                    {stepStatus.map(step => (
-                        <div
-                            key={step.id}
-                            style={{
-                                padding: '12px',
-                                borderRadius: '6px',
-                                background: step.completed ? 'var(--accent-light)' : '#f5f5f5',
-                                border: `1px solid ${step.completed ? 'var(--accent)' : '#ddd'}`,
+    const checklistItems = [
+        { id: 'c1', text: 'All form sections save to localStorage' },
+        { id: 'c2', text: 'Live preview updates in real-time' },
+        { id: 'c3', text: 'Template switching preserves data' },
+        { id: 'c4', text: 'Color theme persists after refresh' },
+        { id: 'c5', text: 'ATS score calculates correctly' },
+        { id: 'c6', text: 'Score updates live on edit' },
+        { id: 'c7', text: 'Export buttons work (copy/download)' },
+        { id: 'c8', text: 'Empty states handled gracefully' },
+        { id: 'c9', text: 'Mobile responsive layout works' },
+        { id: 'c10', text: 'No console errors on any page' }
+    ];
+
+    return (
+        <div className="proof-page" style={{ padding: '40px 20px', background: 'var(--bg-primary)', minHeight: '100vh' }}>
+            <div className="card" style={{ maxWidth: '900px', margin: '0 auto', background: 'white', padding: '40px', borderRadius: '12px', border: '1px solid var(--border)' }}>
+
+                <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '40px' }}>
+                    <div>
+                        <h1 style={{ fontSize: '2.4rem', fontFamily: 'var(--font-serif)', color: 'var(--text-primary)', marginBottom: '8px' }}>
+                            Project 3 Shipment
+                        </h1>
+                        <p style={{ color: 'var(--text-secondary)' }}>Final verification and artifact collection for AI Resume Builder.</p>
+                    </div>
+                    <div className={`badge ${isShipped ? 'shipped' : ''}`} style={{
+                        padding: '8px 16px',
+                        borderRadius: '20px',
+                        fontSize: '0.85rem',
+                        fontWeight: 700,
+                        background: isShipped ? '#10b981' : '#f59e0b',
+                        color: 'white'
+                    }}>
+                        {isShipped ? 'Shipped' : 'In Progress'}
+                    </div>
+                </header>
+
+                {/* Section A: Step Completion Overview */}
+                <section style={{ marginBottom: '40px' }}>
+                    <h3 style={{ fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-secondary)', marginBottom: '20px', borderBottom: '1px solid #eee', paddingBottom: '8px' }}>
+                        A. Step Completion Overview
+                    </h3>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '12px' }}>
+                        {stepStatus.map(step => (
+                            <div key={step.id} style={{
+                                padding: '16px',
+                                border: '1px solid var(--border)',
+                                borderRadius: '8px',
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                background: step.completed ? '#f0fdf4' : 'white'
+                            }}>
+                                <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Step {step.id}</span>
+                                {step.completed ? <CheckCircle size={20} color="#10b981" /> : <XCircle size={20} color="#ccc" />}
+                            </div>
+                        ))}
+                    </div>
+                </section>
+
+                {/* Section B: Manual Verification Checklist */}
+                <section style={{ marginBottom: '40px' }}>
+                    <h3 style={{ fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-secondary)', marginBottom: '20px', borderBottom: '1px solid #eee', paddingBottom: '8px' }}>
+                        B. 10-Item Quality Checklist
+                    </h3>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                        {checklistItems.map(item => (
+                            <label key={item.id} style={{
                                 display: 'flex',
                                 alignItems: 'center',
-                                justifyContent: 'space-between'
-                            }}
-                        >
-                            <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>Step {step.id}</span>
-                            {step.completed ? (
-                                <CheckCircle size={18} color="var(--accent)" />
-                            ) : (
-                                <XCircle size={18} color="#999" />
-                            )}
-                        </div>
-                    ))}
-                </div>
-
-                <div style={{ padding: 'var(--spacing-lg)', background: '#f9f9f9', borderRadius: '8px', border: '1px solid var(--border)', marginBottom: 'var(--spacing-xl)' }}>
-                    <h3 style={{ fontSize: '1rem', marginBottom: 'var(--spacing-md)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <CheckCircle size={18} color="var(--accent)" /> Verify it works
-                    </h3>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                        {[
-                            { id: 'bg', text: 'Is the background color off-white (#F7F6F3), not pure white?' },
-                            { id: 'font', text: 'Are headings using a serif font with generous spacing?' },
-                            { id: 'accent', text: 'Is the accent color deep red (#8B0000), used sparingly?' },
-                            { id: 'spacing', text: 'Is spacing consistent using 8/16/24/40/64px scale?' },
-                            { id: 'colors', text: 'Are there at most 4 colors used across the entire UI?' }
-                        ].map(item => (
-                            <label key={item.id} style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', fontSize: '0.95rem' }}>
-                                <input type="checkbox" style={{ width: '18px', height: '18px', accentColor: 'var(--accent)' }} />
-                                {item.text}
+                                gap: '12px',
+                                padding: '12px 16px',
+                                border: '1px solid var(--border)',
+                                borderRadius: '8px',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s',
+                                background: checks[item.id] ? '#f8fafc' : 'white'
+                            }}>
+                                <input
+                                    type="checkbox"
+                                    checked={checks[item.id]}
+                                    onChange={() => toggleCheck(item.id)}
+                                    style={{ width: '18px', height: '18px', accentColor: 'var(--accent)' }}
+                                />
+                                <span style={{ fontSize: '0.9rem', fontWeight: 500 }}>{item.text}</span>
                             </label>
                         ))}
                     </div>
-                </div>
+                </section>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                        <label style={{ fontSize: '0.9rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <LinkIcon size={16} /> Lovable Project Link
-                        </label>
-                        <input
-                            className="premium-input"
-                            style={{ width: '100%', padding: '12px', borderRadius: '4px', border: '1px solid var(--border)' }}
-                            value={links.lovable}
-                            onChange={(e) => setLinks({ ...links, lovable: e.target.value })}
-                            placeholder="https://lovable.dev/projects/..."
-                        />
+                {/* Section C: Artifact Collection */}
+                <section style={{ marginBottom: '40px' }}>
+                    <h3 style={{ fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-secondary)', marginBottom: '20px', borderBottom: '1px solid #eee', paddingBottom: '8px' }}>
+                        C. Artifact Collection
+                    </h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                        <div className="input-group">
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', fontWeight: 600, marginBottom: '8px' }}>
+                                <LinkIcon size={16} /> Lovable Project Link
+                            </label>
+                            <input
+                                className="input-field"
+                                value={links.lovable}
+                                onChange={(e) => setLinks({ ...links, lovable: e.target.value })}
+                                placeholder="https://lovable.dev/projects/..."
+                            />
+                        </div>
+                        <div className="input-group">
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', fontWeight: 600, marginBottom: '8px' }}>
+                                <Github size={16} /> GitHub Repository Link
+                            </label>
+                            <input
+                                className="input-field"
+                                value={links.github}
+                                onChange={(e) => setLinks({ ...links, github: e.target.value })}
+                                placeholder="https://github.com/user/repo"
+                            />
+                        </div>
+                        <div className="input-group">
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', fontWeight: 600, marginBottom: '8px' }}>
+                                <Globe size={16} /> Deployed Vercel URL
+                            </label>
+                            <input
+                                className="input-field"
+                                value={links.deploy}
+                                onChange={(e) => setLinks({ ...links, deploy: e.target.value })}
+                                placeholder="https://ai-resume-builder.vercel.app"
+                            />
+                        </div>
                     </div>
+                </section>
 
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                        <label style={{ fontSize: '0.9rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <Github size={16} /> GitHub Repository URL
-                        </label>
-                        <input
-                            className="premium-input"
-                            style={{ width: '100%', padding: '12px', borderRadius: '4px', border: '1px solid var(--border)' }}
-                            value={links.github}
-                            onChange={(e) => setLinks({ ...links, github: e.target.value })}
-                            placeholder="https://github.com/user/repo"
-                        />
-                    </div>
+                {/* Final Actions */}
+                <div style={{ padding: '32px', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
+                    {isShipped ? (
+                        <div style={{ marginBottom: '24px' }}>
+                            <div style={{ color: '#10b981', fontWeight: 700, fontSize: '1.2rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginBottom: '8px' }}>
+                                <ShieldCheck size={28} /> Project 3 Shipped Successfully.
+                            </div>
+                            <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>All requirements met. Ready for final submission.</p>
+                        </div>
+                    ) : (
+                        <div style={{ marginBottom: '24px', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+                            Complete all steps, checks, and links to unlock final submission.
+                        </div>
+                    )}
 
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                        <label style={{ fontSize: '0.9rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <Globe size={16} /> Deployed URL
-                        </label>
-                        <input
-                            className="premium-input"
-                            style={{ width: '100%', padding: '12px', borderRadius: '4px', border: '1px solid var(--border)' }}
-                            value={links.deploy}
-                            onChange={(e) => setLinks({ ...links, deploy: e.target.value })}
-                            placeholder="https://project-name.vercel.app"
-                        />
-                    </div>
-
-                    <div style={{ marginTop: '20px', display: 'flex', gap: '12px' }}>
-                        <button
-                            className="btn-primary"
-                            style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}
-                            onClick={handleCopyFinal}
-                        >
-                            <Copy size={18} /> Copy Final Submission
-                        </button>
-                        <button
-                            className="btn-primary"
-                            style={{ background: 'var(--success)', flex: 1 }}
-                            onClick={() => {
-                                localStorage.clear();
-                                alert('Project state reset for demo purposes');
-                                window.location.href = '/rb/01-problem';
-                            }}
-                        >
-                            Reset All Progress
-                        </button>
-                    </div>
+                    <button
+                        className="btn-primary"
+                        disabled={!isShipped}
+                        onClick={handleCopyFinal}
+                        style={{ width: '100%', maxWidth: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', height: '48px', margin: '0 auto' }}
+                    >
+                        <Copy size={18} /> Copy Final Submission
+                    </button>
                 </div>
             </div>
         </div>

@@ -1,7 +1,38 @@
-import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Database, Award, Lightbulb, CheckCircle2, Layout, Info } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Plus, Trash2, Database, Award, Lightbulb, CheckCircle2, Layout, Info, X, Sparkles, ChevronDown, ChevronUp, ExternalLink, Github } from 'lucide-react';
 
 const ACTION_VERBS = ['Built', 'Developed', 'Designed', 'Implemented', 'Led', 'Improved', 'Created', 'Optimized', 'Automated'];
+
+// Reuseable Tag Input Component
+const TagInput = ({ tags, onAdd, onRemove, placeholder }) => {
+    const [input, setInput] = useState('');
+
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter' && input.trim()) {
+            e.preventDefault();
+            onAdd(input.trim());
+            setInput('');
+        }
+    };
+
+    return (
+        <div className="tag-input-wrapper">
+            {tags.map((tag, idx) => (
+                <span key={idx} className="tag-pill">
+                    {tag}
+                    <span className="tag-remove" onClick={() => onRemove(idx)}><X size={14} /></span>
+                </span>
+            ))}
+            <input
+                className="tag-input"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder={placeholder || "Type and press Enter..."}
+            />
+        </div>
+    );
+};
 
 const Builder = () => {
     const [resumeData, setResumeData] = useState({
@@ -10,19 +41,29 @@ const Builder = () => {
         education: [],
         experience: [],
         projects: [],
-        skills: '',
+        skills: { technical: [], soft: [], tools: [] },
         links: { github: '', linkedin: '' }
     });
 
     const [score, setScore] = useState(0);
     const [suggestions, setSuggestions] = useState([]);
     const [template, setTemplate] = useState('Classic');
+    const [isSuggesting, setIsSuggesting] = useState(false);
+    const [expandedProjects, setExpandedProjects] = useState({});
 
     // Hydrate from localStorage
     useEffect(() => {
         const savedData = localStorage.getItem('resumeBuilderData');
         if (savedData) {
-            try { setResumeData(JSON.parse(savedData)); } catch (e) { }
+            try {
+                const parsed = JSON.parse(savedData);
+                // Migration logic for old skills structure
+                if (typeof parsed.skills === 'string') {
+                    const oldSkills = parsed.skills.split(',').map(s => s.trim()).filter(s => s.length > 0);
+                    parsed.skills = { technical: oldSkills, soft: [], tools: [] };
+                }
+                setResumeData(parsed);
+            } catch (e) { }
         }
         const savedTemplate = localStorage.getItem('resumeTemplateChoice');
         if (savedTemplate) {
@@ -38,36 +79,33 @@ const Builder = () => {
     }, [resumeData, template]);
 
     const calculateATSScore = (data) => {
-        let currentScore = 0;
-        const currentSuggestions = [];
+        let s = 0;
+        const sugs = [];
 
-        const summaryWords = data.summary.trim() ? data.summary.trim().split(/\s+/).length : 0;
-        if (summaryWords >= 40 && summaryWords <= 120) currentScore += 15;
-        else if (summaryWords < 40) currentSuggestions.push({ id: 'summary', text: "Write a stronger summary (40–120 words)." });
+        // Rules
+        if (data.personal.name) s += 10; else sugs.push({ id: 'name', text: "Add your full name (+10)" });
+        if (data.personal.email) s += 10; else sugs.push({ id: 'email', text: "Add a professional email (+10)" });
+        if (data.summary?.length > 50) s += 10; else sugs.push({ id: 'summary', text: "Write a summary >50 chars (+10)" });
 
-        if (data.projects.length >= 2) currentScore += 10;
-        else currentSuggestions.push({ id: 'projects', text: "Add at least 2 projects." });
+        const hasBullets = data.experience?.some(e => e.description.includes('•') || e.description.includes('-'));
+        if (hasBullets) s += 15; else sugs.push({ id: 'bullets', text: "Use bullet points in experience (+15)" });
 
-        if (data.experience.length >= 1) currentScore += 10;
-        else currentSuggestions.push({ id: 'experience', text: "Add work or internship experience." });
+        if (data.education?.length > 0) s += 10; else sugs.push({ id: 'edu', text: "Add education history (+10)" });
 
-        const skillsCount = data.skills ? data.skills.split(',').filter(s => s.trim().length > 0).length : 0;
-        if (skillsCount >= 8) currentScore += 10;
-        else currentSuggestions.push({ id: 'skills', text: "Add more skills (target 8+)." });
+        const skillCount = (data.skills?.technical?.length || 0) + (data.skills?.soft?.length || 0) + (data.skills?.tools?.length || 0);
+        if (skillCount >= 5) s += 10; else sugs.push({ id: 'skills', text: "Add at least 5 skills (+10)" });
 
-        if (data.links.github || data.links.linkedin) currentScore += 10;
+        if (data.projects?.length > 0) s += 10; else sugs.push({ id: 'proj', text: "Add at least 1 project (+10)" });
 
-        const hasNumbers = [...data.experience, ...data.projects].some(item =>
-            /[0-9]/.test(item.description) || /%|X|k|M/i.test(item.description)
-        );
-        if (hasNumbers) currentScore += 15;
-        else currentSuggestions.push({ id: 'numbers', text: "Add measurable impact (numbers) in bullets." });
+        if (data.personal.phone) s += 5; else sugs.push({ id: 'phone', text: "Add phone number (+5)" });
+        if (data.links?.linkedin) s += 5; else sugs.push({ id: 'li', text: "Add LinkedIn (+5)" });
+        if (data.links?.github) s += 5; else sugs.push({ id: 'gh', text: "Add GitHub (+5)" });
 
-        const isEduComplete = data.education.length > 0 && data.education.every(edu => edu.school && edu.degree && edu.year);
-        if (isEduComplete) currentScore += 10;
+        const hasVerbs = ACTION_VERBS.some(v => data.summary?.toLowerCase().includes(v));
+        if (hasVerbs) s += 10; else sugs.push({ id: 'verbs', text: "Use action verbs in summary (+10)" });
 
-        setScore(Math.min(currentScore, 100));
-        setSuggestions(currentSuggestions.slice(0, 3));
+        setScore(s);
+        setSuggestions(sugs.slice(0, 3));
     };
 
     const getBulletGuidance = (text) => {
@@ -82,31 +120,48 @@ const Builder = () => {
         return errors;
     };
 
-    const loadSampleData = () => {
-        setResumeData({
-            personal: { name: 'Divya Sharma', email: 'divya.sharma@example.com', phone: '+91 98765 43210', location: 'Bangalore, India' },
-            summary: 'Passionate and results-driven Full Stack Developer with 2+ years of experience in building scalable web applications. Expert in React, Node.js, and cloud architecture, focusing on performance optimization and writing 100% clean, maintainable code for diverse enterprise solutions.',
-            education: [{ school: 'KodNest Institute', degree: 'Full Stack Web Development', year: '2025' }],
-            experience: [{ company: 'Tech Solutions', role: 'Frontend Intern', duration: 'June 2024 - Dec 2024', description: 'Developed 10+ responsive UI components reducing load time by 30%.' }],
-            projects: [
-                { title: 'AI Resume Builder', tech: 'React, Vite', description: 'Built a premium resume platform with 100/100 deterministic scoring.' },
-                { title: 'E-commerce API', tech: 'Node.js, MongoDB', description: 'Architected a backend system handling 5k+ requests per minute.' }
-            ],
-            skills: 'React, JavaScript, CSS, HTML, Node.js, Git, SQL, MongoDB, AWS, Docker',
-            links: { github: 'https://github.com/Divya07-22', linkedin: 'https://linkedin.com/in/divyasharma' }
-        });
+    const suggestSkills = () => {
+        setIsSuggesting(true);
+        setTimeout(() => {
+            setResumeData(prev => ({
+                ...prev,
+                skills: {
+                    technical: Array.from(new Set([...prev.skills.technical, "TypeScript", "React", "Node.js", "PostgreSQL", "GraphQL"])),
+                    soft: Array.from(new Set([...prev.skills.soft, "Team Leadership", "Problem Solving"])),
+                    tools: Array.from(new Set([...prev.skills.tools, "Git", "Docker", "AWS"]))
+                }
+            }));
+            setIsSuggesting(false);
+        }, 1000);
     };
 
-    const handlePersonalChange = (e) => {
-        const { name, value } = e.target;
-        setResumeData(prev => ({ ...prev, personal: { ...prev.personal, [name]: value } }));
+    const handleSkillAdd = (category, tag) => {
+        if (resumeData.skills[category].includes(tag)) return;
+        setResumeData(prev => ({
+            ...prev,
+            skills: { ...prev.skills, [category]: [...prev.skills[category], tag] }
+        }));
+    };
+
+    const handleSkillRemove = (category, index) => {
+        setResumeData(prev => ({
+            ...prev,
+            skills: { ...prev.skills, [category]: prev.skills[category].filter((_, i) => i !== index) }
+        }));
+    };
+
+    const toggleProject = (index) => {
+        setExpandedProjects(prev => ({ ...prev, [index]: !prev[index] }));
     };
 
     const addItem = (section) => {
         const item = section === 'education' ? { school: '', degree: '', year: '' } :
             section === 'experience' ? { company: '', role: '', duration: '', description: '' } :
-                { title: '', tech: '', description: '' };
+                { title: '', description: '', techStack: [], liveUrl: '', githubUrl: '' };
         setResumeData(prev => ({ ...prev, [section]: [...prev[section], item] }));
+        if (section === 'projects') {
+            setExpandedProjects(prev => ({ ...prev, [resumeData.projects.length]: true }));
+        }
     };
 
     const updateItem = (section, index, field, value) => {
@@ -158,18 +213,26 @@ const Builder = () => {
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-lg)' }}>
                     <h2 style={{ fontFamily: 'var(--font-serif)' }}>Resume Content</h2>
-                    <button className="btn-ghost" onClick={loadSampleData}><Database size={16} /> Load Sample Data</button>
                 </div>
 
                 {/* Form Sections */}
                 <section className="form-section">
                     <h3>Personal Info</h3>
-                    <input className="input-field" name="name" value={resumeData.personal.name} onChange={handlePersonalChange} placeholder="Full Name" />
+                    <input className="input-field" name="name" value={resumeData.personal.name} onChange={(e) => setResumeData(prev => ({ ...prev, personal: { ...prev.personal, name: e.target.value } }))} placeholder="Full Name" />
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginTop: '12px' }}>
-                        <input className="input-field" name="email" value={resumeData.personal.email} onChange={handlePersonalChange} placeholder="Email" />
-                        <input className="input-field" name="phone" value={resumeData.personal.phone} onChange={handlePersonalChange} placeholder="Phone" />
+                        <input className="input-field" value={resumeData.personal.email} onChange={(e) => setResumeData(prev => ({ ...prev, personal: { ...prev.personal, email: e.target.value } }))} placeholder="Email" />
+                        <input className="input-field" value={resumeData.personal.phone} onChange={(e) => setResumeData(prev => ({ ...prev, personal: { ...prev.personal, phone: e.target.value } }))} placeholder="Phone" />
                     </div>
-                    <input className="input-field" style={{ marginTop: '12px' }} name="location" value={resumeData.personal.location} onChange={handlePersonalChange} placeholder="Location" />
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginTop: '12px' }}>
+                        <div className="input-with-icon" style={{ position: 'relative' }}>
+                            <Linkedin size={16} style={{ position: 'absolute', left: '10px', top: '12px', color: '#666' }} />
+                            <input className="input-field" style={{ paddingLeft: '32px' }} value={resumeData.links.linkedin} onChange={(e) => setResumeData(prev => ({ ...prev, links: { ...prev.links, linkedin: e.target.value } }))} placeholder="LinkedIn URL" />
+                        </div>
+                        <div className="input-with-icon" style={{ position: 'relative' }}>
+                            <Github size={16} style={{ position: 'absolute', left: '10px', top: '12px', color: '#666' }} />
+                            <input className="input-field" style={{ paddingLeft: '32px' }} value={resumeData.links.github} onChange={(e) => setResumeData(prev => ({ ...prev, links: { ...prev.links, github: e.target.value } }))} placeholder="GitHub URL" />
+                        </div>
+                    </div>
                 </section>
 
                 <section className="form-section">
@@ -177,6 +240,68 @@ const Builder = () => {
                     <textarea className="input-field" style={{ height: '80px' }} value={resumeData.summary} onChange={(e) => setResumeData({ ...resumeData, summary: e.target.value })} placeholder="Professional summary..." />
                 </section>
 
+                {/* Education Section */}
+                <section className="form-section">
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}><h3>Education</h3><button className="btn-ghost" onClick={() => addItem('education')}><Plus size={16} /></button></div>
+                    {resumeData.education.map((edu, index) => (
+                        <div key={index} style={{ marginBottom: '16px', padding: '16px', border: '1px solid var(--border)', borderRadius: '4px', background: '#fcfcfc' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '12px', marginBottom: '8px' }}>
+                                <input className="input-field" value={edu.school} onChange={(e) => updateItem('education', index, 'school', e.target.value)} placeholder="University / School" />
+                                <input className="input-field" value={edu.year} onChange={(e) => updateItem('education', index, 'year', e.target.value)} placeholder="Year (e.g. 2024)" />
+                            </div>
+                            <input className="input-field" value={edu.degree} onChange={(e) => updateItem('education', index, 'degree', e.target.value)} placeholder="Degree (e.g. B.Tech CS)" />
+                            <button className="btn-ghost" onClick={() => removeItem('education', index)} style={{ color: 'var(--error)', marginTop: '8px' }}><Trash2 size={16} /></button>
+                        </div>
+                    ))}
+                </section>
+
+                {/* Advanced Skills Section */}
+                <section className="form-section">
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                        <h3>Skills</h3>
+                        <button className="btn-spark" onClick={suggestSkills} disabled={isSuggesting}>
+                            <Sparkles size={16} /> {isSuggesting ? 'Analyzing...' : 'Suggest Skills'}
+                        </button>
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        <div>
+                            <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px', display: 'block' }}>
+                                Technical Skills ({resumeData.skills.technical.length})
+                            </label>
+                            <TagInput
+                                tags={resumeData.skills.technical}
+                                onAdd={(tag) => handleSkillAdd('technical', tag)}
+                                onRemove={(idx) => handleSkillRemove('technical', idx)}
+                                placeholder="Add tech skills..."
+                            />
+                        </div>
+                        <div>
+                            <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px', display: 'block' }}>
+                                Soft Skills ({resumeData.skills.soft.length})
+                            </label>
+                            <TagInput
+                                tags={resumeData.skills.soft}
+                                onAdd={(tag) => handleSkillAdd('soft', tag)}
+                                onRemove={(idx) => handleSkillRemove('soft', idx)}
+                                placeholder="Add soft skills..."
+                            />
+                        </div>
+                        <div>
+                            <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px', display: 'block' }}>
+                                Tools & Technologies ({resumeData.skills.tools.length})
+                            </label>
+                            <TagInput
+                                tags={resumeData.skills.tools}
+                                onAdd={(tag) => handleSkillAdd('tools', tag)}
+                                onRemove={(idx) => handleSkillRemove('tools', idx)}
+                                placeholder="Add tools..."
+                            />
+                        </div>
+                    </div>
+                </section>
+
+                {/* Experience Section */}
                 <section className="form-section">
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}><h3>Experience</h3><button className="btn-ghost" onClick={() => addItem('experience')}><Plus size={16} /></button></div>
                     {resumeData.experience.map((exp, index) => (
@@ -192,21 +317,57 @@ const Builder = () => {
                     ))}
                 </section>
 
+                {/* Advanced Projects Section */}
                 <section className="form-section">
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}><h3>Projects</h3><button className="btn-ghost" onClick={() => addItem('projects')}><Plus size={16} /></button></div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                        <h3>Projects</h3>
+                        <button className="btn-ghost" onClick={() => addItem('projects')}><Plus size={16} /> Add Project</button>
+                    </div>
                     {resumeData.projects.map((proj, index) => (
-                        <div key={index} style={{ marginBottom: '20px', padding: '16px', border: '1px solid var(--border)', borderRadius: '4px' }}>
-                            <input className="input-field" style={{ marginBottom: '8px' }} value={proj.title} onChange={(e) => updateItem('projects', index, 'title', e.target.value)} placeholder="Title" />
-                            <textarea className="input-field" value={proj.description} onChange={(e) => updateItem('projects', index, 'description', e.target.value)} placeholder="Description..." />
-                            {getBulletGuidance(proj.description)?.map((err, i) => (
-                                <div key={i} className="guidance-inline"><Info size={12} /> {err}</div>
-                            ))}
-                            <button className="btn-ghost" onClick={() => removeItem('projects', index)} style={{ color: 'var(--error)', marginTop: '8px' }}><Trash2 size={16} /></button>
+                        <div key={index} className="project-card-ui">
+                            <div className="project-card-header" onClick={() => toggleProject(index)}>
+                                <span style={{ fontWeight: 600 }}>{proj.title || "New Project"}</span>
+                                {expandedProjects[index] ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                            </div>
+                            {expandedProjects[index] && (
+                                <div className="project-card-body">
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                        <input className="input-field" value={proj.title} onChange={(e) => updateItem('projects', index, 'title', e.target.value)} placeholder="Project Title" />
+                                        <div>
+                                            <textarea
+                                                className="input-field"
+                                                style={{ height: '80px' }}
+                                                value={proj.description}
+                                                onChange={(e) => e.target.value.length <= 200 && updateItem('projects', index, 'description', e.target.value)}
+                                                placeholder="Description..."
+                                            />
+                                            <small className={`char-counter ${proj.description.length >= 200 ? 'limit' : ''}`}>
+                                                {proj.description.length}/200
+                                            </small>
+                                            {getBulletGuidance(proj.description)?.map((err, i) => (
+                                                <div key={i} className="guidance-inline"><Info size={12} /> {err}</div>
+                                            ))}
+                                        </div>
+                                        <div>
+                                            <label style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '4px', display: 'block' }}>Tech Stack</label>
+                                            <TagInput
+                                                tags={proj.techStack || []}
+                                                onAdd={(tag) => updateItem('projects', index, 'techStack', [...(proj.techStack || []), tag])}
+                                                onRemove={(idx) => updateItem('projects', index, 'techStack', proj.techStack.filter((_, i) => i !== idx))}
+                                                placeholder="Add technology..."
+                                            />
+                                        </div>
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                                            <input className="input-field" value={proj.liveUrl || ''} onChange={(e) => updateItem('projects', index, 'liveUrl', e.target.value)} placeholder="Live URL (Optional)" />
+                                            <input className="input-field" value={proj.githubUrl || ''} onChange={(e) => updateItem('projects', index, 'githubUrl', e.target.value)} placeholder="GitHub URL (Optional)" />
+                                        </div>
+                                        <button className="btn-ghost" onClick={() => removeItem('projects', index)} style={{ color: 'var(--error)', alignSelf: 'flex-start' }}><Trash2 size={16} /> Delete Project</button>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     ))}
                 </section>
-
-                <section className="form-section"><h3>Skills</h3><input className="input-field" value={resumeData.skills} onChange={(e) => setResumeData({ ...resumeData, skills: e.target.value })} placeholder="Comma separated skills..." /></section>
             </div>
 
             <div className="preview-column">
@@ -214,34 +375,60 @@ const Builder = () => {
                     <div className="resume-header">
                         <h1 className="resume-name">{resumeData.personal.name || 'Your Name'}</h1>
                         <div className="resume-contact">{resumeData.personal.email} {resumeData.personal.phone && ` • ${resumeData.personal.phone}`}</div>
-                        <div className="resume-contact">{resumeData.personal.location}</div>
                     </div>
 
-                    {resumeData.summary && <div className="resume-section"><div className="resume-section-title">Summary</div><p style={{ fontSize: '0.9rem' }}>{resumeData.summary}</p></div>}
+                    {resumeData.summary && <div className="resume-section"><div className="resume-section-title">Summary</div><p style={{ fontSize: '0.85rem' }}>{resumeData.summary}</p></div>}
 
-                    {resumeData.experience.length > 0 && (
+                    {/* Categorized Skills in Preview */}
+                    {(resumeData.skills.technical.length > 0 || resumeData.skills.soft.length > 0 || resumeData.skills.tools.length > 0) && (
                         <div className="resume-section">
-                            <div className="resume-section-title">Experience</div>
-                            {resumeData.experience.map((exp, i) => (
-                                <div key={i} style={{ marginBottom: '10px' }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700 }}><span>{exp.company}</span></div>
-                                    <div style={{ fontStyle: 'italic', fontSize: '0.85rem' }}>{exp.role}</div>
-                                    <p style={{ fontSize: '0.85rem' }}>• {exp.description}</p>
+                            <div className="resume-section-title">Skills</div>
+                            {resumeData.skills.technical.length > 0 && (
+                                <div style={{ marginBottom: '6px' }}>
+                                    <span style={{ fontWeight: 700, fontSize: '0.8rem', marginRight: '8px' }}>Technical:</span>
+                                    {resumeData.skills.technical.map((s, i) => <span key={i} className="preview-pill">{s}</span>)}
                                 </div>
-                            ))}
+                            )}
+                            {resumeData.skills.soft.length > 0 && (
+                                <div style={{ marginBottom: '6px' }}>
+                                    <span style={{ fontWeight: 700, fontSize: '0.8rem', marginRight: '8px' }}>Soft Skills:</span>
+                                    {resumeData.skills.soft.map((s, i) => <span key={i} className="preview-pill">{s}</span>)}
+                                </div>
+                            )}
+                            {resumeData.skills.tools.length > 0 && (
+                                <div>
+                                    <span style={{ fontWeight: 700, fontSize: '0.8rem', marginRight: '8px' }}>Tools:</span>
+                                    {resumeData.skills.tools.map((s, i) => <span key={i} className="preview-pill">{s}</span>)}
+                                </div>
+                            )}
                         </div>
                     )}
 
+                    {/* Project Cards in Preview */}
                     {resumeData.projects.length > 0 && (
                         <div className="resume-section">
                             <div className="resume-section-title">Projects</div>
-                            {resumeData.projects.map((proj, i) => (
-                                <div key={i} style={{ marginBottom: '8px' }}><div style={{ fontWeight: 700 }}>{proj.title}</div><p style={{ fontSize: '0.85rem' }}>• {proj.description}</p></div>
-                            ))}
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                {resumeData.projects.map((proj, i) => (
+                                    <div key={i} style={{ padding: '10px', border: '1px solid #eee', borderRadius: '4px' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                                            <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>{proj.title}</span>
+                                            <div style={{ display: 'flex', gap: '8px' }}>
+                                                {proj.githubUrl && <a href={proj.githubUrl} target="_blank" rel="noreferrer" style={{ color: '#666' }}><Github size={14} /></a>}
+                                                {proj.liveUrl && <a href={proj.liveUrl} target="_blank" rel="noreferrer" style={{ color: '#666' }}><ExternalLink size={14} /></a>}
+                                            </div>
+                                        </div>
+                                        <p style={{ fontSize: '0.8rem', marginBottom: '8px' }}>{proj.description}</p>
+                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                                            {proj.techStack?.map((tech, ti) => (
+                                                <span key={ti} style={{ fontSize: '0.7rem', padding: '1px 6px', border: '1px solid #ddd', borderRadius: '3px', color: '#555' }}>{tech}</span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     )}
-
-                    {resumeData.skills && <div className="resume-section"><div className="resume-section-title">Skills</div><p style={{ fontSize: '0.9rem' }}>{resumeData.skills}</p></div>}
                 </div>
             </div>
         </div>

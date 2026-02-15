@@ -1,56 +1,53 @@
-# AI Resume Builder
+# AI Resume Builder — Premium Build Track
 
-A premium, high-fidelity resume building platform built within the **KodNest Premium Build System**. This project combines a structured engineering Build Track with a high-performance product workspace designed for impact-driven careers.
+A professional, high-fidelity resume building platform built using **React.js (Vite)** and **Vanilla CSS**. This project features a structured engineering substrate (Build Track) and a production-ready resume editor.
 
-🚀 **Live Demo**: [https://ai-resume-taupe.vercel.app/](https://ai-resume-taupe.vercel.app/)
+🚀 **Explore the Platform**: [Live Vercel Deployment](https://ai-resume-taupe.vercel.app/)
 
-## 🎨 Design Philosophy
-- **Oxblood Palette**: Minimalist aesthetic using `#8B0000` accents on a `#F7F6F3` background.
-- **Typography**: Sophisticated pairing of `'Playfair Display'` (Serif) for headings and `'Inter'` (Sans-serif) for body text.
-- **Architecture**: Strict separation of high-integrity resume data and visual presentation templates.
+---
 
-## 🛠️ Project Structure
+## 🏗️ Core Engineering (Build Track)
+The platform is organized into an 8-step gated engineering track, focusing on architectural integrity and project validation:
+1. **Gated Progression**: Step-by-step navigation (01–08) ensuring all project artifacts are completed.
+2. **Build Panel**: Integrated prompt generation workspace for Lovable.
+3. **Artifact Collection**: Centralized hub for Lovable links, GitHub repos, and Deployment URLs.
+4. **Validation Engine**: Real-time 5-point design quality checklist for project submission.
 
-### 1. Build Track (Project 3 Shell)
-An 8-step engineering substrate focused on the design and architecture of the system:
-- **Sequential Gating**: Mandatory artifact-driven progression (01–08).
-- **Build Panel**: Integrated workspace for Lovable prompt generation.
-- **Verification Engine**: Built-in 5-point design quality checklist.
-- **Route**: Accessible via `/rb/01-problem`.
+---
 
-### 2. Product Workspace (AI Resume Builder)
-A professional-grade builder experience with real-time feedback:
+## 🚀 Product Features (AI Resume Builder)
 
-#### **A. Template System**
-- **Classic**: Traditional single-column professional layout.
-- **Modern**: Bold, accented headers with improved visual hierarchy.
-- **Minimal**: Contemporary, simplified structure focusing on pure content.
-- *Layouts are switchable instantly without losing content or affecting ATS scores.*
+### 🎨 1. Visual Customization System
+- **Architectural Templates**: Switch between **Classic** (Serif), **Modern** (Two-column Sidebar), and **Minimal** (Sans-serif) layouts instantly.
+- **Global Theme Engine**: 5 curated HSL color palettes (Teal, Navy, Burgundy, Forest, Charcoal) that update headings, sidebars, and accents.
+- **Template Picker**: Visual thumbnails with layout sketches for effortless selection.
+- **Persistence**: All visual preferences are saved to `localStorage`.
 
-#### **B. Writing Assistant & Bullet Discipline**
-- **Inline Guidance**: Real-time tips for every bullet point in Experience and Projects.
-- **Action Verb Enforcement**: Encourages strong starts (e.g., *Built, Designed, Optimized*).
-- **Measurable Impact**: Flags bullets missing numeric proof (%, X, numbers).
+### ✍️ 2. Writing Assistant & ATS Scoring (v2)
+- **Deterministic ATS Engine**: A rules-based 0–100 score evaluating resume strength, completeness, and impact.
+- **Circular Progress Meter**: Dynamic SVG visualization with color-coded readiness states (Red/Amber/Green).
+- **Improvement Tips**: Live, actionable suggestions to boost your score (e.g., "Add action verbs [+10 pts]").
+- **Bullet Discipline**: Real-time feedback for action verbs (Built, Led, etc.) and measurable impact (%, numbers).
 
-#### **C. ATS Scoring Engine (v1)**
-- **Deterministic Scoring**: A 0–100 score based on hard rules for summary length, project volume, skill density, and measurability.
-- **Top 3 Improvements**: An actionable panel that identifies the most impactful fixes to boost your score.
+### 🛠️ 3. Advanced Skills & Projects
+- **Categorized Skill Tags**: Dedicated groups for **Technical**, **Soft**, and **Tools** with high-speed tag-style inputs (**Enter** to add).
+- **✨ Suggest Skills**: One-click automation to populate industry-standard skill sets.
+- **Project Accordions**: Collapsible project entries supporting tech stack tagging, GitHub URLs, and Live links.
+- **Precision Writing**: Strictly enforced 200-character limits for punchy project descriptions.
 
-#### **D. Technical Features**
-- **Autosave Engine**: Instant persistence to `localStorage` (zero data loss on refresh).
-- **Live Preview**: Real-time rendering of content with professional typography.
-- **Clean Mode**: Pure B&W preview optimized for ATS and high-fidelity PDF output.
+### 📄 4. Export & Reliability Engine
+- **High-Fidelity PDF**: Native browser-print integration with dedicated `@media print` rules for perfect A4 output.
+- **Plain-Text Serialization**: Generating hierarchical text summaries for quick clipboard copying.
+- **Toast Notifications**: Sleek, non-blocking UI confirmations for all export actions.
+- **Zero Data Loss**: Robust `localStorage` integration ensures your progress is never lost.
 
-## 💻 Tech Stack
-- **Framework**: React.js (Vite)
-- **Routing**: React Router DOM (Gated Routes)
+---
+
+## 💻 Technical Implementation
+- **Framework**: React.js
 - **Icons**: Lucide React
-- **Styling**: Vanilla CSS with Design Tokens
-
-## 🏗️ Local Setup
-1. Clone the repository: `git clone https://github.com/Divya07-22/AI-Resume.git`
-2. Install dependencies: `npm install`
-3. Run the development server: `npm run dev`
+- **Theme**: HSL Color System
+- **Architecture**: Separated Content State (Resume Data) from Presentation Layer (Templates).
 
 ---
 *Developed as part of the Placement Readiness Framework.*

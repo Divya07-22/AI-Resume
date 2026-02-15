@@ -24,8 +24,8 @@ const ProductLayout = ({ children }) => {
                     </NavLink>
                 </nav>
 
-                <div className="badge badge-status">
-                    v1.0 Skeleton
+                <div className={`badge ${localStorage.getItem('rb_project_status') === 'Shipped' ? 'shipped' : 'in-progress'}`}>
+                    {localStorage.getItem('rb_project_status') === 'Shipped' ? 'Shipped' : 'In Progress'}
                 </div>
             </header>
 
