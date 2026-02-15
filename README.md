@@ -1,44 +1,44 @@
-# AI Resume Builder — Build Track (Project 3)
+# AI Resume Builder
 
-A premium, high-fidelity resume building substrate built within the **KodNest Premium Build System**. This project focuses on a strict, minimalist design philosophy ("Calm, Intentional, Coherent") and a sequential, artifact-driven build process.
+A premium, high-fidelity resume building platform built within the **KodNest Premium Build System**. This project combines a structured engineering Build Track with a high-performance product skeleton designed for impact-driven resumes.
+
+🚀 **Live Demo**: [https://ai-resume-taupe.vercel.app/](https://ai-resume-taupe.vercel.app/)
 
 ## 🎨 Design Philosophy
 - **Oxblood Palette**: Minimalist aesthetic using `#8B0000` accents on a `#F7F6F3` background.
 - **Typography**: Sophisticated pairing of `'Playfair Display'` (Serif) for headings and `'Inter'` (Sans-serif) for body text.
 - **Geometry**: Strict adherence to an 8px spacing scale (8/16/24/40/64px).
 
-## 🛠️ System Architecture
-The project is implemented as an 8-step build track with a mandatory sequential gating system:
+## 🛠️ Project Structure
 
-1.  **01 Problem**: Identifying the core challenges in resume building.
-2.  **02 Market**: Analyzing the competitive landscape.
-3.  **03 Architecture**: Designing the system components.
-4.  **04 HLD**: High-Level Design of the engine.
-5.  **05 LLD**: Low-Level Design and data modeling.
-6.  **06 Build**: Implementation phase.
-7.  **07 Test**: Quality assurance and validation.
-8.  **08 Ship**: Final preparation for deployment.
-9.  **Proof Hub**: Final validation and artifact aggregation.
+### 1. Build Track (Project 3 Shell)
+An 8-step engineering substrate focused on the design and architecture of the system:
+- **Sequential Gating**: Mandatory artifact-driven progression.
+- **Build Panel**: Integrated workspace for Lovable prompt generation.
+- **Verification Engine**: Built-in 5-point design quality checklist.
+- **Route**: Accessible via `/rb/01-problem`.
+
+### 2. Product Skeleton (AI Resume Builder)
+The core application providing a professional-grade builder experience:
+- **Two-Column Workspace**: Real-time form-to-preview synchronization.
+- **Live Preview**: Structured, A4-ready resume layout.
+- **Clean Mode**: Pure B&W preview optimized for ATS and professional readability.
+- **Sample Data**: One-click population of professional experiences.
 
 ## 🚀 Key Features
-- **Sequential Gating**: Users cannot skip steps; each step requires an artifact "upload" (simulated via local storage) to unlock the next.
-- **Dynamic Build Panel**: Integrated workspace for Lovable prompt generation and quick-copy utilities.
-- **Verification Engine**: Built-in 5-point design verification checklist to ensure high-quality UI/UX standards.
-- **Proof of Authenticity**: Generates a formatted submission report with Lovable, GitHub, and Deployment links.
+- **Impact-Driven Content**: Form sections designed to highlight measurable achievements.
+- **Data Persistence**: Local storage synchronization to prevent progress loss.
+- **Premium Navigation**: Seamless transitions between Builder, Preview, and Proof modes.
+- **ATS-Friendly**: Minimalist, high-quality typography without distracting graphics.
 
 ## 💻 Tech Stack
 - **Framework**: React.js (Vite)
-- **Routing**: React Router DOM (Gated Routes)
+- **Routing**: React Router DOM
 - **Icons**: Lucide React
-- **Styling**: Vanilla CSS with CSS Variables (Design Tokens)
+- **Styling**: Vanilla CSS with Design Tokens
 
-## 🏗️ Getting Started
+## 🏗️ Local Setup
 
-### Prerequisites
-- Node.js (v18 or higher)
-- npm
-
-### Installation
 1. Clone the repository:
    ```bash
    git clone https://github.com/Divya07-22/AI-Resume.git
