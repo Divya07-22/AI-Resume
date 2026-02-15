@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Database } from 'lucide-react';
+import { Plus, Trash2, Database, Award, Lightbulb, CheckCircle2 } from 'lucide-react';
 
 const Builder = () => {
     const [resumeData, setResumeData] = useState({
@@ -12,18 +12,91 @@ const Builder = () => {
         links: { github: '', linkedin: '' }
     });
 
-    // Load from localStorage on mount
+    const [score, setScore] = useState(0);
+    const [suggestions, setSuggestions] = useState([]);
+
+    // Hydrate from localStorage
     useEffect(() => {
-        const saved = localStorage.getItem('resume_data_skeleton');
+        const saved = localStorage.getItem('resumeBuilderData');
         if (saved) {
-            setResumeData(JSON.parse(saved));
+            try {
+                setResumeData(JSON.parse(saved));
+            } catch (e) {
+                console.error("Failed to parse saved data");
+            }
         }
     }, []);
 
-    // Sync to localStorage on change
+    // Autosave and calculate score
     useEffect(() => {
-        localStorage.setItem('resume_data_skeleton', JSON.stringify(resumeData));
+        localStorage.setItem('resumeBuilderData', JSON.stringify(resumeData));
+        calculateATSScore(resumeData);
     }, [resumeData]);
+
+    const calculateATSScore = (data) => {
+        let currentScore = 0;
+        const currentSuggestions = [];
+
+        // 1. Summary (40-120 words)
+        const summaryWords = data.summary.trim() ? data.summary.trim().split(/\s+/).length : 0;
+        if (summaryWords >= 40 && summaryWords <= 120) {
+            currentScore += 15;
+        } else if (data.summary.trim()) {
+            currentSuggestions.push("Write a stronger summary (target 40–120 words).");
+        } else {
+            currentSuggestions.push("Add a professional summary.");
+        }
+
+        // 2. Projects (at least 2)
+        if (data.projects.length >= 2) {
+            currentScore += 10;
+        } else {
+            currentSuggestions.push("Add at least 2 projects to showcase your skills.");
+        }
+
+        // 3. Experience (at least 1)
+        if (data.experience.length >= 1) {
+            currentScore += 10;
+        } else {
+            currentSuggestions.push("Add at least 1 work experience entry.");
+        }
+
+        // 4. Skills (at least 8)
+        const skillsCount = data.skills ? data.skills.split(',').filter(s => s.trim().length > 0).length : 0;
+        if (skillsCount >= 8) {
+            currentScore += 10;
+        } else {
+            currentSuggestions.push("Add more skills (target 8+ keywords).");
+        }
+
+        // 5. Links
+        if (data.links.github || data.links.linkedin) {
+            currentScore += 10;
+        } else {
+            currentSuggestions.push("Add GitHub or LinkedIn links for proof.");
+        }
+
+        // 6. Measurable Impact (numbers)
+        const hasNumbers = [...data.experience, ...data.projects].some(item =>
+            /[0-9]/.test(item.description) || /%|X|k|M/i.test(item.description)
+        );
+        if (hasNumbers) {
+            currentScore += 15;
+        } else {
+            currentSuggestions.push("Add measurable impact (numbers/%) in your bullet points.");
+        }
+
+        // 7. Education Complete
+        const isEduComplete = data.education.length > 0 && data.education.every(edu => edu.school && edu.degree && edu.year);
+        if (isEduComplete) {
+            currentScore += 10;
+        } else {
+            currentSuggestions.push("Complete all fields in the Education section.");
+        }
+
+        setScore(Math.min(currentScore, 100));
+        setSuggestions(currentSuggestions.slice(0, 3)); // Max 3 suggestions
+    };
 
     const loadSampleData = () => {
         const sample = {
@@ -33,17 +106,18 @@ const Builder = () => {
                 phone: '+91 98765 43210',
                 location: 'Bangalore, India'
             },
-            summary: 'Passionate Full Stack Developer with experience in building scalable web applications using React and Node.js. Focused on performance optimization and clean code architecture.',
+            summary: 'Passionate and results-driven Full Stack Developer with 2+ years of experience in building scalable web applications. Expert in React, Node.js, and cloud architecture, focusing on performance optimization and writing 100% clean, maintainable code for diverse enterprise solutions.',
             education: [
                 { school: 'KodNest Institute', degree: 'Full Stack Web Development', year: '2025' }
             ],
             experience: [
-                { company: 'Tech Solutions', role: 'Frontend Intern', duration: 'June 2024 - Dec 2024', description: 'Developed 10+ responsive UI components.' }
+                { company: 'Tech Solutions', role: 'Frontend Intern', duration: 'June 2024 - Dec 2024', description: 'Developed 10+ responsive UI components reducing load time by 30%. Worked on user engagement features using React.' }
             ],
             projects: [
-                { title: 'AI Resume Builder', tech: 'React, Vite', description: 'Built a premium resume platform with live scoring.' }
+                { title: 'AI Resume Builder', tech: 'React, Vite', description: 'Built a premium resume platform with 100/100 deterministic scoring.' },
+                { title: 'E-commerce API', tech: 'Node.js, MongoDB', description: 'Architected a backend system handling 5k+ requests per minute.' }
             ],
-            skills: 'React, JavaScript, CSS, HTML, Node.js, Git, SQL',
+            skills: 'React, JavaScript, CSS, HTML, Node.js, Git, SQL, MongoDB, AWS, Docker',
             links: { github: 'https://github.com/Divya07-22', linkedin: 'https://linkedin.com/in/divyasharma' }
         };
         setResumeData(sample);
@@ -84,6 +158,35 @@ const Builder = () => {
         <div className="builder-container">
             {/* Scrollable Form Column */}
             <div className="form-column">
+                {/* ATS Score Header */}
+                <div className="score-container">
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <Award size={18} color="var(--accent)" /> ATS Readiness Score
+                        </span>
+                        <span style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--accent)' }}>{score}/100</span>
+                    </div>
+                    <div className="score-meter-bg">
+                        <div className="score-meter-fill" style={{ width: `${score}%` }}></div>
+                    </div>
+
+                    {suggestions.length > 0 && (
+                        <div className="suggestions-list">
+                            {suggestions.map((s, i) => (
+                                <div key={i} className="suggestion-item">
+                                    <Lightbulb size={14} className="suggestion-bullet" />
+                                    <span>{s}</span>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                    {score === 100 && (
+                        <div className="suggestion-item" style={{ color: 'var(--success)', fontWeight: 600 }}>
+                            <CheckCircle2 size={14} /> Resume is ATS optimized!
+                        </div>
+                    )}
+                </div>
+
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-lg)' }}>
                     <h2 style={{ fontFamily: 'var(--font-serif)' }}>Resume Content</h2>
                     <button className="btn-ghost" onClick={loadSampleData} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -91,7 +194,7 @@ const Builder = () => {
                     </button>
                 </div>
 
-                {/* Personal Info */}
+                {/* Form Sections */}
                 <section className="form-section">
                     <h3>Personal Info</h3>
                     <div className="input-group">
@@ -114,7 +217,6 @@ const Builder = () => {
                     </div>
                 </section>
 
-                {/* Summary */}
                 <section className="form-section">
                     <h3>Professional Summary</h3>
                     <textarea
@@ -126,7 +228,6 @@ const Builder = () => {
                     />
                 </section>
 
-                {/* Education */}
                 <section className="form-section">
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                         <h3>Education</h3>
@@ -135,14 +236,15 @@ const Builder = () => {
                     {resumeData.education.map((edu, index) => (
                         <div key={index} style={{ marginBottom: '20px', padding: '16px', border: '1px solid var(--border)', borderRadius: '4px' }}>
                             <div className="input-group"><input className="input-field" value={edu.school} onChange={(e) => updateItem('education', index, 'school', e.target.value)} placeholder="University / School" /></div>
-                            <div className="input-group"><input className="input-field" value={edu.degree} onChange={(e) => updateItem('education', index, 'degree', e.target.value)} placeholder="Degree" /></div>
-                            <div className="input-group"><input className="input-field" value={edu.year} onChange={(e) => updateItem('education', index, 'year', e.target.value)} placeholder="Graduation Year" /></div>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                                <input className="input-field" value={edu.degree} onChange={(e) => updateItem('education', index, 'degree', e.target.value)} placeholder="Degree" />
+                                <input className="input-field" value={edu.year} onChange={(e) => updateItem('education', index, 'year', e.target.value)} placeholder="Year" />
+                            </div>
                             <button className="btn-ghost" onClick={() => removeItem('education', index)} style={{ marginTop: '8px', color: 'var(--error)' }}><Trash2 size={16} /></button>
                         </div>
                     ))}
                 </section>
 
-                {/* Experience */}
                 <section className="form-section">
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                         <h3>Experience</h3>
@@ -159,7 +261,6 @@ const Builder = () => {
                     ))}
                 </section>
 
-                {/* Projects */}
                 <section className="form-section">
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                         <h3>Projects</h3>
@@ -168,14 +269,13 @@ const Builder = () => {
                     {resumeData.projects.map((proj, index) => (
                         <div key={index} style={{ marginBottom: '20px', padding: '16px', border: '1px solid var(--border)', borderRadius: '4px' }}>
                             <div className="input-group"><input className="input-field" value={proj.title} onChange={(e) => updateItem('projects', index, 'title', e.target.value)} placeholder="Project Title" /></div>
-                            <div className="input-group"><input className="input-field" value={proj.tech} onChange={(e) => updateItem('projects', index, 'tech', e.target.value)} placeholder="Technologies Used" /></div>
-                            <textarea className="input-field" value={proj.description} onChange={(e) => updateItem('projects', index, 'description', e.target.value)} placeholder="Project description..." />
+                            <div className="input-group"><input className="input-field" value={proj.tech} onChange={(e) => updateItem('projects', index, 'tech', e.target.value)} placeholder="Technologies" /></div>
+                            <textarea className="input-field" value={proj.description} onChange={(e) => updateItem('projects', index, 'description', e.target.value)} placeholder="Description..." />
                             <button className="btn-ghost" onClick={() => removeItem('projects', index)} style={{ marginTop: '8px', color: 'var(--error)' }}><Trash2 size={16} /></button>
                         </div>
                     ))}
                 </section>
 
-                {/* Skills */}
                 <section className="form-section">
                     <h3>Skills</h3>
                     <input
@@ -186,7 +286,6 @@ const Builder = () => {
                     />
                 </section>
 
-                {/* Links */}
                 <section className="form-section">
                     <h3>Links</h3>
                     <div className="input-group"><label>GitHub</label><input className="input-field" value={resumeData.links.github} onChange={(e) => setResumeData({ ...resumeData, links: { ...resumeData.links, github: e.target.value } })} /></div>
@@ -194,46 +293,82 @@ const Builder = () => {
                 </section>
             </div>
 
-            {/* Live Preview Column */}
+            {/* Real Live Preview Column */}
             <div className="preview-column">
                 <div className="resume-paper" style={{ transform: 'scale(0.8)', transformOrigin: 'top center' }}>
+                    {/* Header */}
                     <div className="resume-header">
                         <h1 className="resume-name">{resumeData.personal.name || 'Your Name'}</h1>
                         <div className="resume-contact">
-                            {resumeData.personal.email} {resumeData.personal.phone && ` | ${resumeData.personal.phone}`}
+                            {resumeData.personal.email} {resumeData.personal.phone && ` • ${resumeData.personal.phone}`}
                         </div>
                         <div className="resume-contact">
-                            {resumeData.personal.location} {resumeData.links.github && ` | GitHub: ${resumeData.links.github}`}
+                            {resumeData.personal.location}
+                        </div>
+                        <div className="resume-contact" style={{ fontSize: '0.8rem', marginTop: '4px' }}>
+                            {resumeData.links.github && `GitHub: ${resumeData.links.github}`}
+                            {resumeData.links.github && resumeData.links.linkedin && ` • `}
+                            {resumeData.links.linkedin && `LinkedIn: ${resumeData.links.linkedin}`}
                         </div>
                     </div>
 
-                    <div className="resume-section">
-                        <div className="resume-section-title">Summary</div>
-                        <p style={{ fontSize: '0.95rem' }}>{resumeData.summary || 'Summary placeholder...'}</p>
-                    </div>
+                    {/* Sections based on content existence */}
+                    {resumeData.summary && (
+                        <div className="resume-section">
+                            <div className="resume-section-title">Summary</div>
+                            <p style={{ fontSize: '0.95rem' }}>{resumeData.summary}</p>
+                        </div>
+                    )}
 
-                    <div className="resume-section">
-                        <div className="resume-section-title">Experience</div>
-                        {resumeData.experience.length > 0 ? resumeData.experience.map((exp, i) => (
-                            <div key={i} style={{ marginBottom: '12px' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700 }}>
-                                    <span>{exp.company}</span>
-                                    <span>{exp.duration}</span>
+                    {resumeData.experience.length > 0 && (
+                        <div className="resume-section">
+                            <div className="resume-section-title">Experience</div>
+                            {resumeData.experience.map((exp, i) => (
+                                <div key={i} style={{ marginBottom: '12px' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700 }}>
+                                        <span>{exp.company}</span>
+                                        <span>{exp.duration}</span>
+                                    </div>
+                                    <div style={{ fontStyle: 'italic', fontSize: '0.9rem' }}>{exp.role}</div>
+                                    <p style={{ fontSize: '0.9rem', marginTop: '4px' }}>{exp.description}</p>
                                 </div>
-                                <div style={{ fontStyle: 'italic' }}>{exp.role}</div>
-                                <p style={{ fontSize: '0.9rem' }}>{exp.description}</p>
-                            </div>
-                        )) : <p>Experience placeholder...</p>}
-                    </div>
+                            ))}
+                        </div>
+                    )}
 
-                    <div className="resume-section">
-                        <div className="resume-section-title">Skills</div>
-                        <p style={{ fontSize: '0.95rem' }}>{resumeData.skills || 'Skills placeholder...'}</p>
-                    </div>
+                    {resumeData.education.length > 0 && (
+                        <div className="resume-section">
+                            <div className="resume-section-title">Education</div>
+                            {resumeData.education.map((edu, i) => (
+                                <div key={i} style={{ marginBottom: '8px' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700 }}>
+                                        <span>{edu.school}</span>
+                                        <span>{edu.year}</span>
+                                    </div>
+                                    <div style={{ fontSize: '0.9rem' }}>{edu.degree}</div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
 
-                    <div style={{ border: '2px dashed #ddd', padding: '40px', textAlign: 'center', color: '#aaa', marginTop: 'auto' }}>
-                        Structured Preview Shell
-                    </div>
+                    {resumeData.projects.length > 0 && (
+                        <div className="resume-section">
+                            <div className="resume-section-title">Projects</div>
+                            {resumeData.projects.map((proj, i) => (
+                                <div key={i} style={{ marginBottom: '8px' }}>
+                                    <div style={{ fontWeight: 700 }}>{proj.title} <span style={{ fontWeight: 400, color: '#666', fontSize: '0.85rem' }}>— {proj.tech}</span></div>
+                                    <p style={{ fontSize: '0.9rem' }}>{proj.description}</p>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    {resumeData.skills && (
+                        <div className="resume-section">
+                            <div className="resume-section-title">Skills</div>
+                            <p style={{ fontSize: '0.95rem' }}>{resumeData.skills}</p>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

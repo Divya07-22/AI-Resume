@@ -4,7 +4,7 @@ const Preview = () => {
     const [resumeData, setResumeData] = useState(null);
 
     useEffect(() => {
-        const saved = localStorage.getItem('resume_data_skeleton');
+        const saved = localStorage.getItem('resumeBuilderData');
         if (saved) {
             setResumeData(JSON.parse(saved));
         }
