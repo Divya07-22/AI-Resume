@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import { Printer, Copy, AlertTriangle, CheckCircle2, Github, ExternalLink, Download, Trophy, Lightbulb } from 'lucide-react';
+import { Printer, Copy, AlertTriangle, CheckCircle2, Github, ExternalLink, Download, Trophy, Lightbulb, Info, Linkedin } from 'lucide-react';
 
 const THEMES = [
     { name: 'Teal', color: 'hsl(168, 60%, 40%)' },

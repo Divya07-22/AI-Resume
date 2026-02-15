@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Plus, Trash2, Database, Award, Lightbulb, CheckCircle2, Layout, Info, X, Sparkles, ChevronDown, ChevronUp, ExternalLink, Github } from 'lucide-react';
+import { Plus, Trash2, Database, Award, Lightbulb, CheckCircle2, Layout, Info, X, Sparkles, ChevronDown, ChevronUp, ExternalLink, Github, Linkedin } from 'lucide-react';
 
 const ACTION_VERBS = ['Built', 'Developed', 'Designed', 'Implemented', 'Led', 'Improved', 'Created', 'Optimized', 'Automated'];
 
