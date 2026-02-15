@@ -3,24 +3,25 @@
   --bg-secondary: #FFFFFF;
   --text-primary: #111111;
   --text-secondary: #666666;
-  --accent: #8B0000; /* Oxblood / Premium Red */
+  --accent: #8B0000;
+  /* Oxblood / Premium Red */
   --accent-light: #FCEAEA;
   --border: #E0E0E0;
   --success: #2E7D32;
   --warning: #FF8F00;
   --error: #D32F2F;
   --surface: #FFFFFF;
-  
+
   --font-serif: 'Playfair Display', serif;
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-  
+
   --spacing-xs: 4px;
   --spacing-sm: 8px;
   --spacing-md: 16px;
   --spacing-lg: 24px;
   --spacing-xl: 40px;
   --spacing-xxl: 64px;
-  
+
   --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   --header-height: 56px;
   --context-height: 48px;
@@ -38,10 +39,14 @@ body {
   color: var(--text-primary);
   font-family: var(--font-sans);
   line-height: 1.6;
-  overflow: hidden; /* Main layout handles scrolling */
+  overflow: hidden;
+  /* Main layout handles scrolling */
 }
 
-h1, h2, h3, h4 {
+h1,
+h2,
+h3,
+h4 {
   font-family: var(--font-serif);
   font-weight: 600;
 }
@@ -52,7 +57,8 @@ button {
   transition: all 0.2s ease;
 }
 
-textarea, input {
+textarea,
+input {
   font-family: var(--font-sans);
 }
 
@@ -151,10 +157,166 @@ textarea, input {
   cursor: not-allowed;
 }
 
-.card {
-  background: var(--surface);
+/* Product Layout & Navigation */
+.product-nav {
+  display: flex;
+  gap: var(--spacing-xl);
+  height: 100%;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.9rem;
+  border-bottom: 2px solid transparent;
+  padding: 0 var(--spacing-xs);
+  transition: all 0.2s ease;
+}
+
+.nav-link:hover,
+.nav-link.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+/* Home Section */
+.home-hero {
+  max-width: 800px;
+  margin: var(--spacing-xxl) auto;
+  text-align: center;
+}
+
+.hero-headline {
+  font-size: 4rem;
+  line-height: 1.1;
+  margin-bottom: var(--spacing-lg);
+  color: var(--text-primary);
+}
+
+/* Builder Layout */
+.builder-container {
+  display: flex;
+  height: calc(100vh - var(--header-height) - var(--footer-height));
+  overflow: hidden;
+}
+
+.form-column {
+  width: 45%;
+  overflow-y: auto;
+  padding: var(--spacing-xl);
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border);
+}
+
+.preview-column {
+  width: 55%;
+  overflow-y: auto;
+  padding: var(--spacing-xl);
+  background: var(--bg-primary);
+  display: flex;
+  justify-content: center;
+}
+
+/* Form Styles */
+.form-section {
+  margin-bottom: var(--spacing-xl);
+}
+
+.form-section h3 {
+  font-size: 1.2rem;
+  margin-bottom: var(--spacing-md);
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: var(--spacing-xs);
+}
+
+.input-group {
+  margin-bottom: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.input-group label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.input-field {
+  padding: 10px;
   border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: var(--spacing-lg);
-  box-shadow: var(--shadow);
+  border-radius: 4px;
+  font-size: 0.95rem;
+  width: 100%;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-light);
+}
+
+/* Resume Preview (A4 Paper) */
+.resume-paper {
+  width: 210mm;
+  min-height: 297mm;
+  background: white;
+  padding: 20mm;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.resume-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.resume-section-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid #111;
+  padding-bottom: 4px;
+  margin-bottom: 8px;
+}
+
+.resume-header {
+  text-align: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.resume-name {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.resume-contact {
+  font-size: 0.9rem;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  color: var(--text-secondary);
+}
+
+.btn-ghost {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+.btn-ghost:hover {
+  background: var(--bg-primary);
+  color: var(--text-primary);
 }

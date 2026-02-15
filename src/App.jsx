@@ -27,12 +27,24 @@ const GatedRoute = ({ children, stepIndex }) => {
   return children;
 };
 
+import Home from './pages/Home';
+import Builder from './pages/Builder';
+import Preview from './pages/Preview';
+import Proof from './pages/Proof';
+import ProductLayout from './components/layout/ProductLayout';
+
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Navigate to="/rb/01-problem" replace />} />
+        {/* Product Routes */}
+        <Route path="/" element={<ProductLayout><Home /></ProductLayout>} />
+        <Route path="/builder" element={<ProductLayout><Builder /></ProductLayout>} />
+        <Route path="/preview" element={<ProductLayout><Preview /></ProductLayout>} />
+        <Route path="/proof" element={<ProductLayout><Proof /></ProductLayout>} />
 
+        {/* Build Track Routes (Project 3 Shell) */}
+        <Route path="/rb" element={<Navigate to="/rb/01-problem" replace />} />
         {STEPS.map((step, index) => (
           <Route
             key={step.id}
