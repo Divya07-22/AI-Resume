@@ -2,12 +2,16 @@ import React, { useEffect, useState } from 'react';
 
 const Preview = () => {
     const [resumeData, setResumeData] = useState(null);
+    const [template, setTemplate] = useState('Classic');
 
     useEffect(() => {
-        const saved = localStorage.getItem('resumeBuilderData');
-        if (saved) {
-            setResumeData(JSON.parse(saved));
+        const savedData = localStorage.getItem('resumeBuilderData');
+        if (savedData) {
+            setResumeData(JSON.parse(savedData));
         }
+
+        const savedTemplate = localStorage.getItem('resumeTemplateChoice');
+        if (savedTemplate) setTemplate(savedTemplate);
     }, []);
 
     if (!resumeData) {
@@ -19,8 +23,13 @@ const Preview = () => {
     }
 
     return (
-        <div className="preview-container" style={{ padding: 'var(--spacing-xl)', background: '#EAEAEA', minHeight: '100%', display: 'flex', justifyContent: 'center' }}>
-            <div className="resume-paper" style={{ boxShadow: '0 20px 50px rgba(0,0,0,0.15)' }}>
+        <div className="preview-container" style={{ padding: 'var(--spacing-xl)', background: '#EAEAEA', minHeight: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            {/* Template Tab Info in Preview */}
+            <div style={{ marginBottom: '24px', background: 'white', padding: '8px 24px', borderRadius: '50px', fontSize: '0.9rem', fontWeight: 600, color: 'var(--accent)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+                Viewing in {template} Mode
+            </div>
+
+            <div className={`resume-paper template-${template.toLowerCase()}`} style={{ boxShadow: '0 20px 50px rgba(0,0,0,0.15)' }}>
                 {/* Header */}
                 <div className="resume-header">
                     <h1 className="resume-name" style={{ color: '#000', letterSpacing: '-0.02em' }}>

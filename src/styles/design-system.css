@@ -356,12 +356,82 @@ input {
   display: flex;
   align-items: flex-start;
   gap: 8px;
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  padding: 4px 0;
+  width: fit-content;
 }
 
-.suggestion-bullet {
+/* Template Layouts */
+.template-classic {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.template-modern {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.template-modern .resume-header {
+  border-left: 4px solid var(--accent);
+  padding-left: 20px;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.template-modern .resume-section-title {
+  background: var(--bg-primary);
+  padding: 4px 12px;
+  display: inline-block;
+  border-bottom: none;
+  font-weight: 700;
+}
+
+.template-minimal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.template-minimal .resume-header {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 12px;
+  margin-bottom: 8px;
+}
+
+.template-minimal .resume-section-title {
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  border-bottom: none;
+  color: var(--text-secondary);
+}
+
+/* Template Selector Tabs */
+.template-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: var(--spacing-lg);
+  padding: 4px;
+  background: var(--bg-primary);
+  border-radius: 8px;
+  width: fit-content;
+}
+
+.template-tab.active {
+  background: white;
   color: var(--accent);
-  margin-top: 2px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  font-weight: 600;
+}
+
+/* Bullet Guidance */
+.guidance-inline {
+  font-size: 0.75rem;
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+  font-weight: 500;
 }
