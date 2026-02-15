@@ -20,16 +20,17 @@ An 8-step engineering substrate focused on the design and architecture of the sy
 
 ### 2. Product Skeleton (AI Resume Builder)
 The core application providing a professional-grade builder experience:
+- **Autosave Engine**: Real-time persistence using `localStorage` (zero data loss).
+- **ATS Scoring v1**: Deterministic 0–100 score based on industry-standard resume patterns.
+- **Smart Suggestions**: Context-aware tips to improve resume readability and impact.
 - **Two-Column Workspace**: Real-time form-to-preview synchronization.
-- **Live Preview**: Structured, A4-ready resume layout.
-- **Clean Mode**: Pure B&W preview optimized for ATS and professional readability.
-- **Sample Data**: One-click population of professional experiences.
+- **Live Preview**: Structured, A4-ready resume layout with premium typography.
 
 ## 🚀 Key Features
-- **Impact-Driven Content**: Form sections designed to highlight measurable achievements.
-- **Data Persistence**: Local storage synchronization to prevent progress loss.
-- **Premium Navigation**: Seamless transitions between Builder, Preview, and Proof modes.
-- **ATS-Friendly**: Minimalist, high-quality typography without distracting graphics.
+- **Deterministic Feedback**: No black-box AI; clear rules on how to reach a 100/100 score.
+- **Impact-Driven Content**: Form sections designed to highlight measurable achievements (numbers, %, etc.).
+- **Clean Mode**: Pure B&W preview optimized for ATS and professional readability.
+- **Sample Data**: One-click population of high-quality professional content.
 
 ## 💻 Tech Stack
 - **Framework**: React.js (Vite)
