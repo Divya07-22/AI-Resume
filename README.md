@@ -1,53 +1,75 @@
-# AI Resume Builder — Premium Build Track
+# AI Resume Builder — Placement Readiness Project
 
-A professional, high-fidelity resume building platform built using **React.js (Vite)** and **Vanilla CSS**. This project features a structured engineering substrate (Build Track) and a production-ready resume editor.
+A premium, deterministic ATS-optimized resume builder designed for high-impact professional applications. This project demonstrates a production-grade implementation of structured data management, real-time visual synchronization, and a robust shipment certification system.
 
-🚀 **Explore the Platform**: [Live Vercel Deployment](https://ai-resume-taupe.vercel.app/)
+Live Demo: [https://ai-resume-taupe.vercel.app/](https://ai-resume-taupe.vercel.app/)
 
----
+## 🏆 Project Milestones (9 Tasks Completed)
 
-## 🏗️ Core Engineering (Build Track)
-The platform is organized into an 8-step gated engineering track, focusing on architectural integrity and project validation:
-1. **Gated Progression**: Step-by-step navigation (01–08) ensuring all project artifacts are completed.
-2. **Build Panel**: Integrated prompt generation workspace for Lovable.
-3. **Artifact Collection**: Centralized hub for Lovable links, GitHub repos, and Deployment URLs.
-4. **Validation Engine**: Real-time 5-point design quality checklist for project submission.
+### 1. High-Fidelity Design System
+- **KodNest Premium Build System**: A calm, intentional design philosophy using an off-white (#F7F6F3) palette and deep red (#8B0000) accents.
+- **Serif Typography**: Strategic use of elegant serif fonts for headings to convey confidence and authority.
 
----
+### 2. Structured Resume Builder
+- **Autosave Engine**: Real-time persistence using `localStorage` ensures zero data loss during the building process.
+- **7-Section Architecture**: Integrated forms for Personal Info, Professional Summary, Education, Experience, Projects, Skills, and Social Links.
 
-## 🚀 Product Features (AI Resume Builder)
-
-### 🎨 1. Visual Customization System
-- **Architectural Templates**: Switch between **Classic** (Serif), **Modern** (Two-column Sidebar), and **Minimal** (Sans-serif) layouts instantly.
-- **Global Theme Engine**: 5 curated HSL color palettes (Teal, Navy, Burgundy, Forest, Charcoal) that update headings, sidebars, and accents.
-- **Template Picker**: Visual thumbnails with layout sketches for effortless selection.
-- **Persistence**: All visual preferences are saved to `localStorage`.
-
-### ✍️ 2. Writing Assistant & ATS Scoring (v2)
-- **Deterministic ATS Engine**: A rules-based 0–100 score evaluating resume strength, completeness, and impact.
+### 3. ATS Scoring Engine (v2)
+- **Deterministic Logic**: A 0–100 scoring mechanism based on professional standards (measurability, action verbs, completeness).
 - **Circular Progress Meter**: Dynamic SVG visualization with color-coded readiness states (Red/Amber/Green).
-- **Improvement Tips**: Live, actionable suggestions to boost your score (e.g., "Add action verbs [+10 pts]").
-- **Bullet Discipline**: Real-time feedback for action verbs (Built, Led, etc.) and measurable impact (%, numbers).
+- **Live Improvement Tips**: Real-time actionable hints to boost resume score.
 
-### 🛠️ 3. Advanced Skills & Projects
-- **Categorized Skill Tags**: Dedicated groups for **Technical**, **Soft**, and **Tools** with high-speed tag-style inputs (**Enter** to add).
-- **✨ Suggest Skills**: One-click automation to populate industry-standard skill sets.
-- **Project Accordions**: Collapsible project entries supporting tech stack tagging, GitHub URLs, and Live links.
-- **Precision Writing**: Strictly enforced 200-character limits for punchy project descriptions.
+### 4. Advanced Skill & Project Hub
+- **Categorized Skills**: Multi-tag input system for **Technical**, **Soft**, and **Tools** with instant tag creation.
+- **Smart Suggestions**: One-click skill analysis to auto-populate relevant keywords.
+- **Project Cards**: Detailed sub-forms with character counters and URL validation for GitHub/Live links.
 
-### 📄 4. Export & Reliability Engine
-- **High-Fidelity PDF**: Native browser-print integration with dedicated `@media print` rules for perfect A4 output.
-- **Plain-Text Serialization**: Generating hierarchical text summaries for quick clipboard copying.
-- **Toast Notifications**: Sleek, non-blocking UI confirmations for all export actions.
-- **Zero Data Loss**: Robust `localStorage` integration ensures your progress is never lost.
+### 5. Architectural Template Picker
+- **Classic**: Traditional single-column professional layout.
+- **Modern**: High-impact two-column layout with a distinct sidebar.
+- **Minimal**: Clean, whitespace-optimized layout for contemporary industries.
+- **Visual Sketches**: SVG-based layout previews for intuitive switching.
 
----
+### 6. Dynamic Theme Engine
+- **HSL Palette Picker**: Curated professional themes including Teal, Navy, Burgundy, Forest, and Charcoal.
+- **Global Propagation**: Theme accents instantly apply across all components and templates.
 
-## 💻 Technical Implementation
-- **Framework**: React.js
+### 7. Professional Export Engine
+- **PDF Generation**: High-precision `@media print` CSS for A4-compliant exports.
+- **Text Serialization**: Clear hierarchical text export for plain-text applications.
+- **Toast Notifications**: Interactive feedback upon export readiness.
+
+### 8. Validation & Hardening
+- **Advisory Guardrails**: Real-time warnings for missing critical fields (Name, Summary length, etc.).
+- **Data Re-hydration**: Intelligent state recovery ensuring visual and content parity after page refresh.
+
+### 9. Proof + Submission System
+- **Checklist Certification**: A 10-item quality checklist gated shipment status.
+- **Artifact Vault**: Secure collection of Lovable, GitHub, and Deployment URLs with regex validation.
+- **Shipped Status**: Automated status progression from "In Progress" to "Shipped" upon meeting all criteria.
+
+## 🛠️ Technology Stack
+- **Framework**: React.js (Vite)
+- **Styling**: Vanilla CSS (Premium Design System)
 - **Icons**: Lucide React
-- **Theme**: HSL Color System
-- **Architecture**: Separated Content State (Resume Data) from Presentation Layer (Templates).
+- **Persistence**: Browser LocalStorage
+- **Deployment**: Vercel
+
+## 🚀 Final Submission Template
+```text
+AI Resume Builder — Final Submission
+
+Lovable Project: {link}
+GitHub Repository: {link}
+Live Deployment: {link}
+
+Core Capabilities:
+- Structured resume builder
+- Deterministic ATS scoring
+- Template switching
+- PDF export with clean formatting
+- Persistence + validation checklist
+```
 
 ---
-*Developed as part of the Placement Readiness Framework.*
+*Verified and Certified by KodNest Premium Build System — February 2026*
