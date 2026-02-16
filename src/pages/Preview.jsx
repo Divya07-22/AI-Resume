@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react';
 import { Printer, Copy, AlertTriangle, CheckCircle2, Github, ExternalLink, Download, Trophy, Lightbulb, Info, Linkedin } from 'lucide-react';
 
 const THEMES = [
@@ -154,7 +155,15 @@ ${resumeData.projects?.map(proj => `${proj.title}\n${proj.description}\nTech: ${
     };
 
     return (
-        <div className="preview-container" style={{ padding: '40px', background: '#f5f5f5', display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: '100vh' }}>
+        <div className="preview-container" style={{
+            height: '100%',
+            overflowY: 'auto',
+            background: '#f5f5f5',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            padding: '40px'
+        }}>
 
             {/* ATS Scoring Panel */}
             <div className="ats-panel">

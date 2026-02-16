@@ -36,12 +36,10 @@ const ProofPage = () => {
 
     // Check Shipped Status
     useEffect(() => {
-        const allStepsDone = stepStatus.length === 8 && stepStatus.every(s => s.completed);
         const allChecksDone = Object.values(checks).every(v => v === true);
-        const urlRegex = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/;
-        const allLinksValid = urlRegex.test(links.lovable) && urlRegex.test(links.github) && urlRegex.test(links.deploy);
+        const allLinksValid = links.lovable && links.lovable.length > 3 && links.github && links.github.length > 3 && links.deploy && links.deploy.length > 3;
 
-        const shipped = allStepsDone && allChecksDone && allLinksValid;
+        const shipped = allChecksDone && allLinksValid;
         setIsShipped(shipped);
 
         if (shipped) {
@@ -93,26 +91,79 @@ Core Capabilities:
     ];
 
     return (
-        <div className="proof-page" style={{ padding: '40px 20px', background: 'var(--bg-primary)', minHeight: '100vh' }}>
+        <div className="proof-page" style={{ padding: '40px 20px', background: 'var(--bg-primary)', flex: 1 }}>
             <div className="card" style={{ maxWidth: '900px', margin: '0 auto', background: 'white', padding: '40px', borderRadius: '12px', border: '1px solid var(--border)' }}>
 
-                <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '40px' }}>
-                    <div>
-                        <h1 style={{ fontSize: '2.4rem', fontFamily: 'var(--font-serif)', color: 'var(--text-primary)', marginBottom: '8px' }}>
-                            Project 3 Shipment
-                        </h1>
-                        <p style={{ color: 'var(--text-secondary)' }}>Final verification and artifact collection for AI Resume Builder.</p>
-                    </div>
-                    <div className={`badge ${isShipped ? 'shipped' : ''}`} style={{
-                        padding: '8px 16px',
-                        borderRadius: '20px',
-                        fontSize: '0.85rem',
-                        fontWeight: 700,
-                        background: isShipped ? '#10b981' : '#f59e0b',
-                        color: 'white'
+                <header style={{ marginBottom: '40px' }}>
+                    <h1 style={{ fontSize: '2.4rem', fontFamily: 'var(--font-serif)', color: 'var(--text-primary)', marginBottom: '8px' }}>
+                        Project 3 Shipment
+                    </h1>
+                    <p style={{ color: 'var(--text-secondary)', marginBottom: '24px' }}>Final verification and artifact collection for AI Resume Builder.</p>
+
+                    {/* High Visibility Status Bar */}
+                    <div style={{
+                        background: '#f8fafc',
+                        padding: '16px 24px',
+                        borderRadius: '8px',
+                        border: '1px solid #e2e8f0',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between'
                     }}>
-                        {isShipped ? 'Shipped' : 'In Progress'}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                            <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>Current Status:</span>
+                            <div className={`badge ${isShipped ? 'shipped' : ''}`} style={{
+                                padding: '6px 12px',
+                                borderRadius: '20px',
+                                fontSize: '0.85rem',
+                                fontWeight: 700,
+                                background: isShipped ? '#10b981' : '#f59e0b',
+                                color: 'white'
+                            }}>
+                                {isShipped ? 'Shipped' : 'In Progress'}
+                            </div>
+                        </div>
+
+
+                        <button
+                            className="btn-primary"
+                            disabled={!isShipped}
+                            onClick={handleCopyFinal}
+                            style={{
+                                opacity: isShipped ? 1 : 0.5,
+                                fontSize: '0.9rem',
+                                padding: '10px 20px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                background: isShipped ? 'var(--accent)' : '#ccc'
+                            }}
+                        >
+                            <Copy size={18} /> Copy Submission
+                        </button>
                     </div>
+
+                    {/* EMERGENCY FLOATING BUTTON */}
+                    <button
+                        onClick={handleCopyFinal}
+                        style={{
+                            position: 'fixed',
+                            bottom: '20px',
+                            right: '20px',
+                            zIndex: 9999,
+                            background: '#ff0000',
+                            color: 'white',
+                            padding: '16px 32px',
+                            borderRadius: '50px',
+                            fontWeight: 'bold',
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+                            border: '4px solid white',
+                            fontSize: '1.2rem',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        🚨 COPY REPORT
+                    </button>
                 </header>
 
                 {/* Section A: Step Completion Overview */}

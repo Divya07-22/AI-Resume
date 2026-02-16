@@ -30,7 +30,7 @@ const ProductLayout = ({ children }) => {
             </header>
 
             {/* Main Content Area */}
-            <main style={{ flex: 1, overflow: 'hidden' }}>
+            <main style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                 {children}
             </main>
 

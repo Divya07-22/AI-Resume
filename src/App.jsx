@@ -41,7 +41,7 @@ function App() {
         <Route path="/" element={<ProductLayout><Home /></ProductLayout>} />
         <Route path="/builder" element={<ProductLayout><Builder /></ProductLayout>} />
         <Route path="/preview" element={<ProductLayout><Preview /></ProductLayout>} />
-        <Route path="/proof" element={<ProductLayout><Proof /></ProductLayout>} />
+        <Route path="/proof" element={<ProductLayout><ProofPage /></ProductLayout>} />
 
         {/* Build Track Routes (Project 3 Shell) */}
         <Route path="/rb" element={<Navigate to="/rb/01-problem" replace />} />

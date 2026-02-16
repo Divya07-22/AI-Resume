@@ -42,7 +42,7 @@ body {
   color: var(--text-primary);
   font-family: var(--font-sans);
   line-height: 1.6;
-  overflow: hidden;
+  overflow-y: auto;
 }
 
 h1,
@@ -68,7 +68,7 @@ input {
 .premium-layout {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  min-height: 100vh;
 }
 
 .top-bar {
@@ -126,6 +126,8 @@ input {
   font-size: 0.8rem;
   letter-spacing: 0.05em;
   text-transform: uppercase;
+  width: 100%;
+  flex-shrink: 0;
 }
 
 .badge {
@@ -157,6 +159,35 @@ input {
 .btn-primary:disabled {
   background: #CCCCCC;
   cursor: not-allowed;
+}
+
+/* Product Navigation */
+.product-nav {
+  display: flex;
+  gap: 32px;
+  margin-left: 48px;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 0.95rem;
+  padding: 16px 0;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+  position: relative;
+  top: 1px;
+}
+
+.nav-link:hover {
+  color: var(--text-primary);
+}
+
+.nav-link.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
 }
 
 /* Home Section */

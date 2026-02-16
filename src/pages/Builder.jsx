@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react';
 import { Plus, Trash2, Database, Award, Lightbulb, CheckCircle2, Layout, Info, X, Sparkles, ChevronDown, ChevronUp, ExternalLink, Github, Linkedin } from 'lucide-react';
 
 const ACTION_VERBS = ['Built', 'Developed', 'Designed', 'Implemented', 'Led', 'Improved', 'Created', 'Optimized', 'Automated'];
@@ -375,32 +376,88 @@ const Builder = () => {
                     <div className="resume-header">
                         <h1 className="resume-name">{resumeData.personal.name || 'Your Name'}</h1>
                         <div className="resume-contact">{resumeData.personal.email} {resumeData.personal.phone && ` • ${resumeData.personal.phone}`}</div>
+                        {(resumeData.links.linkedin || resumeData.links.github) && (
+                            <div className="resume-contact" style={{ marginTop: '4px', gap: '16px' }}>
+                                {resumeData.links.linkedin && (
+                                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                        <Linkedin size={12} /> <span style={{ fontSize: '0.85rem' }}>{resumeData.links.linkedin.replace(/^https?:\/\/(www\.)?/, '')}</span>
+                                    </span>
+                                )}
+                                {resumeData.links.github && (
+                                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                        <Github size={12} /> <span style={{ fontSize: '0.85rem' }}>{resumeData.links.github.replace(/^https?:\/\/(www\.)?/, '')}</span>
+                                    </span>
+                                )}
+                            </div>
+                        )}
                     </div>
 
                     {resumeData.summary && <div className="resume-section"><div className="resume-section-title">Summary</div><p style={{ fontSize: '0.85rem' }}>{resumeData.summary}</p></div>}
 
-                    {/* Categorized Skills in Preview */}
-                    {(resumeData.skills.technical.length > 0 || resumeData.skills.soft.length > 0 || resumeData.skills.tools.length > 0) && (
+                    {resumeData.education.length > 0 && (
                         <div className="resume-section">
-                            <div className="resume-section-title">Skills</div>
-                            {resumeData.skills.technical.length > 0 && (
-                                <div style={{ marginBottom: '6px' }}>
-                                    <span style={{ fontWeight: 700, fontSize: '0.8rem', marginRight: '8px' }}>Technical:</span>
-                                    {resumeData.skills.technical.map((s, i) => <span key={i} className="preview-pill">{s}</span>)}
+                            <div className="resume-section-title">Education</div>
+                            {resumeData.education.map((edu, i) => (
+                                <div key={i} style={{ marginBottom: '8px' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 600, fontSize: '0.9rem' }}>
+                                        <span>{edu.school}</span>
+                                        <span>{edu.year}</span>
+                                    </div>
+                                    <div style={{ fontSize: '0.85rem', fontStyle: 'italic' }}>{edu.degree}</div>
                                 </div>
-                            )}
-                            {resumeData.skills.soft.length > 0 && (
-                                <div style={{ marginBottom: '6px' }}>
-                                    <span style={{ fontWeight: 700, fontSize: '0.8rem', marginRight: '8px' }}>Soft Skills:</span>
-                                    {resumeData.skills.soft.map((s, i) => <span key={i} className="preview-pill">{s}</span>)}
+                            ))}
+                        </div>
+                    )}
+
+                    {resumeData.experience.length > 0 && (
+                        <div className="resume-section">
+                            <div className="resume-section-title">Experience</div>
+                            {resumeData.experience.map((exp, i) => (
+                                <div key={i} style={{ marginBottom: '12px' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 600, fontSize: '0.9rem' }}>
+                                        <span>{exp.company}</span>
+                                        <span style={{ fontSize: '0.8rem', color: '#666' }}>{exp.duration}</span>
+                                    </div>
+                                    <div style={{ fontSize: '0.85rem', fontWeight: 600, marginBottom: '2px' }}>{exp.role}</div>
+                                    <p style={{ fontSize: '0.8rem', whiteSpace: 'pre-wrap' }}>{exp.description}</p>
                                 </div>
-                            )}
-                            {resumeData.skills.tools.length > 0 && (
-                                <div>
-                                    <span style={{ fontWeight: 700, fontSize: '0.8rem', marginRight: '8px' }}>Tools:</span>
-                                    {resumeData.skills.tools.map((s, i) => <span key={i} className="preview-pill">{s}</span>)}
-                                </div>
-                            )}
+                            ))}
+                        </div>
+                    )}
+
+                    {/* Technical Skills */}
+                    {resumeData.skills.technical.length > 0 && (
+                        <div className="resume-section">
+                            <div className="resume-section-title">Technical Skills</div>
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                                {resumeData.skills.technical.map((s, i) => (
+                                    <span key={i} className="preview-pill">{s}</span>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Soft Skills */}
+                    {resumeData.skills.soft.length > 0 && (
+                        <div className="resume-section">
+                            <div className="resume-section-title">Soft Skills</div>
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                                {resumeData.skills.soft.map((s, i) => (
+                                    <span key={i} className="preview-pill">{s}</span>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Tools */}
+                    {resumeData.skills.tools.length > 0 && (
+                        <div className="resume-section">
+                            <div className="resume-section-title">Tools & Technologies</div>
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                                {resumeData.skills.tools.map((s, i) => (
+                                    <span key={i} className="preview-pill">{s}</span>
+                                ))}
+                            </div>
                         </div>
                     )}
 
